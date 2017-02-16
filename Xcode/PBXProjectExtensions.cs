@@ -292,5 +292,88 @@ namespace UnityEditor.iOS.Xcode.Extensions
 
             return newTargetGuid;
         }
+
+        /// <summary>
+        /// Adds an external project dependency to the project.
+        /// </summary>
+        /// <param name="path">The path to the external Xcode project (the .xcodeproj file).</param>
+        /// <param name="projectPath">The project path to the new project.</param>
+        /// <param name="sourceTree">The source tree the path is relative to. The [[PBXSourceTree.Group]] tree is not supported.</param>
+        internal static void AddExternalProjectDependency(this PBXProject proj, string path, string projectPath, PBXSourceTree sourceTree)
+        {
+            if (sourceTree == PBXSourceTree.Group)
+                throw new Exception("sourceTree must not be PBXSourceTree.Group");
+            path = PBXPath.FixSlashes(path);
+            projectPath = PBXPath.FixSlashes(projectPath);
+
+            // note: we are duplicating products group for the project reference. Otherwise Xcode crashes.
+            PBXGroupData productGroup = PBXGroupData.CreateRelative("Products");
+            proj.GroupsAddDuplicate(productGroup); // don't use GroupsAdd here
+
+            PBXFileReferenceData fileRef = PBXFileReferenceData.CreateFromFile(path, Path.GetFileName(projectPath),
+                                                                               sourceTree);
+            proj.FileRefsAdd(path, projectPath, null, fileRef);
+            proj.CreateSourceGroup(PBXPath.GetDirectory(projectPath)).children.AddGUID(fileRef.guid);
+
+            proj.project.project.AddReference(productGroup.guid, fileRef.guid);
+        }
+
+        /** This function must be called only after the project the library is in has
+            been added as a dependency via AddExternalProjectDependency. projectPath must be
+            the same as the 'path' parameter passed to the AddExternalProjectDependency.
+            remoteFileGuid must be the guid of the referenced file as specified in
+            PBXFileReference section of the external project
+
+            TODO: what. is remoteInfo entry in PBXContainerItemProxy? Is in referenced project name or
+            referenced library name without extension?
+        */
+        internal static void AddExternalLibraryDependency(this PBXProject proj, string targetGuid, string filename, string remoteFileGuid, string projectPath,
+                                                          string remoteInfo)
+        {
+            PBXNativeTargetData target = proj.nativeTargets[targetGuid];
+            filename = PBXPath.FixSlashes(filename);
+            projectPath = PBXPath.FixSlashes(projectPath);
+
+            // find the products group to put the new library in
+            string projectGuid = proj.FindFileGuidByRealPath(projectPath);
+            if (projectGuid == null)
+                throw new Exception("No such project");
+
+            string productsGroupGuid = null;
+            foreach (var projRef in proj.project.project.projectReferences)
+            {
+                if (projRef.projectRef == projectGuid)
+                {
+                    productsGroupGuid = projRef.group;
+                    break;
+                }
+            }
+
+            if (productsGroupGuid == null)
+                throw new Exception("Malformed project: no project in project references");
+
+            PBXGroupData productGroup = proj.GroupsGet(productsGroupGuid);
+
+            // verify file extension
+            string ext = Path.GetExtension(filename);
+            if (!FileTypeUtils.IsBuildableFile(ext))
+                throw new Exception("Wrong file extension");
+
+            // create ContainerItemProxy object
+            var container = PBXContainerItemProxyData.Create(projectGuid, "2", remoteFileGuid, remoteInfo);
+            proj.containerItems.AddEntry(container);
+
+            // create a reference and build file for the library
+            string typeName = FileTypeUtils.GetTypeName(ext);
+
+            var libRef = PBXReferenceProxyData.Create(filename, typeName, container.guid, "BUILT_PRODUCTS_DIR");
+            proj.references.AddEntry(libRef);
+            PBXBuildFileData libBuildFile = PBXBuildFileData.CreateFromFile(libRef.guid, false, null);
+            proj.BuildFilesAdd(targetGuid, libBuildFile);
+            proj.BuildSectionAny(target, ext, false).files.AddGUID(libBuildFile.guid);
+
+            // add to products folder
+            productGroup.children.AddGUID(libRef.guid);
+        }
     }
 } // namespace UnityEditor.iOS.Xcode
