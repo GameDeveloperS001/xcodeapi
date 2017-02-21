@@ -22,6 +22,16 @@ namespace UnityEditor.iOS.Xcode.PBX
         { 
             return m_Properties; 
         }
+
+        /*  Returns the internal properties dictionary which the user may manipulate directly.
+            If any of the properties are modified, UpdateVars() must be called before any other
+            operation affecting the given Xcode document is executed.
+        */
+        internal PBXElementDict GetPropertiesRaw()
+        {
+            UpdateProps();
+            return m_Properties;
+        }
         
         // returns null if it does not exist
         protected string GetPropertyString(string name)
@@ -555,23 +565,39 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
     }
 
-    internal class PBXShellScriptBuildPhaseData : PBXObjectData
+    internal class PBXShellScriptBuildPhaseData : FileGUIDListBase
     {
-        public GUIDList files;
+        public string name;
+        public string shellPath;
+        public string shellScript;
 
-        private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
-            "files/*",
-        });
-        
-        internal override PropertyCommentChecker checker { get { return checkerData; } }
-        
+        public static PBXShellScriptBuildPhaseData Create(string name, string shellPath, string shellScript)
+        {
+            var res = new PBXShellScriptBuildPhaseData();
+            res.guid = PBXGUID.Generate();
+            res.SetPropertyString("isa", "PBXShellScriptBuildPhase");
+            res.SetPropertyString("buildActionMask", "2147483647");
+            res.files = new List<string>();
+            res.SetPropertyString("runOnlyForDeploymentPostprocessing", "0");
+            res.name = name;
+            res.shellPath = shellPath;
+            res.shellScript = shellScript;
+            return res;
+        }
+
         public override void UpdateProps()
         {
-            SetPropertyList("files", files);
+            base.UpdateProps();
+            SetPropertyString("name", name);
+            SetPropertyString("shellPath", shellPath);
+            SetPropertyString("shellScript", shellScript);
         }
         public override void UpdateVars()
         {
-            files = GetPropertyList("files");
+            base.UpdateVars();
+            name = GetPropertyString("name");
+            shellPath = GetPropertyString("shellPath");
+            shellScript = GetPropertyString("shellScript");
         }
     }
 
@@ -609,13 +635,14 @@ namespace UnityEditor.iOS.Xcode.PBX
     {
         protected SortedDictionary<string, BuildConfigEntryData> entries = new SortedDictionary<string, BuildConfigEntryData>();
         public string name { get { return GetPropertyString("name"); } }
+        public string baseConfigurationReference; // may be null
 
         // Note that QuoteStringIfNeeded does its own escaping. Double-escaping with quotes is
         // required to please Xcode that does not handle paths with spaces if they are not 
         // enclosed in quotes.
         static string EscapeWithQuotesIfNeeded(string name, string value)
         {
-            if (name != "LIBRARY_SEARCH_PATHS")
+            if (name != "LIBRARY_SEARCH_PATHS" && name != "FRAMEWORK_SEARCH_PATHS")
                 return value;
             if (!value.Contains(" "))
                 return value;
@@ -661,6 +688,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         
         public override void UpdateProps()
         {
+            SetPropertyString("baseConfigurationReference", baseConfigurationReference);
+
             var dict = m_Properties.CreateDict("buildSettings");
             foreach (var kv in entries)
             {
@@ -678,6 +707,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         }
         public override void UpdateVars()
         {
+            baseConfigurationReference = GetPropertyString("baseConfigurationReference");
+
             entries = new SortedDictionary<string, BuildConfigEntryData>();
             if (m_Properties.Contains("buildSettings"))
             {

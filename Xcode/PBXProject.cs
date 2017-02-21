@@ -78,7 +78,7 @@ namespace UnityEditor.iOS.Xcode
 
         public static string GetPBXProjectPath(string buildPath)
         {
-            return Utils.CombinePaths(buildPath, "Unity-iPhone.xcodeproj/project.pbxproj");
+            return PBXPath.Combine(buildPath, "Unity-iPhone.xcodeproj/project.pbxproj");
         }
 
         public static string GetUnityTargetName()
@@ -118,8 +118,8 @@ namespace UnityEditor.iOS.Xcode
         // The same file can be referred to by more than one project path.
         private string AddFileImpl(string path, string projectPath, PBXSourceTree tree, bool isFolderReference)
         {
-            path = Utils.FixSlashesInPath(path);
-            projectPath = Utils.FixSlashesInPath(projectPath);
+            path = PBXPath.FixSlashes(path);
+            projectPath = PBXPath.FixSlashes(projectPath);
 
             if (!isFolderReference && Path.GetExtension(path) != Path.GetExtension(projectPath))
                 throw new Exception("Project and real path extensions do not match");
@@ -131,10 +131,10 @@ namespace UnityEditor.iOS.Xcode
             {
                 PBXFileReferenceData fileRef;
                 if (isFolderReference)
-                    fileRef = PBXFileReferenceData.CreateFromFolderReference(path, Utils.GetFilenameFromPath(projectPath), tree);
+                    fileRef = PBXFileReferenceData.CreateFromFolderReference(path, PBXPath.GetFilename(projectPath), tree);
                 else
-                    fileRef = PBXFileReferenceData.CreateFromFile(path, Utils.GetFilenameFromPath(projectPath), tree);
-                PBXGroupData parent = CreateSourceGroup(Utils.GetDirectoryFromPath(projectPath));
+                    fileRef = PBXFileReferenceData.CreateFromFile(path, PBXPath.GetFilename(projectPath), tree);
+                PBXGroupData parent = CreateSourceGroup(PBXPath.GetDirectory(projectPath));
                 parent.children.AddGUID(fileRef.guid);
                 FileRefsAdd(path, projectPath, parent, fileRef);
                 guid = fileRef.guid;
@@ -309,7 +309,7 @@ namespace UnityEditor.iOS.Xcode
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
-            path = Utils.FixSlashesInPath(path);
+            path = PBXPath.FixSlashes(path);
             var fileRef = FileRefsGetByRealPath(path, sourceTree);
             if (fileRef != null)
                 return fileRef.guid;
@@ -318,7 +318,7 @@ namespace UnityEditor.iOS.Xcode
 
         public string FindFileGuidByRealPath(string path)
         {
-            path = Utils.FixSlashesInPath(path);
+            path = PBXPath.FixSlashes(path);
 
             foreach (var tree in FileTypeUtils.AllAbsoluteSourceTrees())
             {
@@ -331,7 +331,7 @@ namespace UnityEditor.iOS.Xcode
 
         public string FindFileGuidByProjectPath(string path)
         {
-            path = Utils.FixSlashesInPath(path);
+            path = PBXPath.FixSlashes(path);
             var fileRef = FileRefsGetByProjectPath(path);
             if (fileRef != null)
                 return fileRef.guid;
@@ -417,7 +417,7 @@ namespace UnityEditor.iOS.Xcode
 
         internal void RemoveFilesByProjectPathRecursive(string projectPath)
         {
-            projectPath = Utils.FixSlashesInPath(projectPath);
+            projectPath = PBXPath.FixSlashes(projectPath);
             PBXGroupData gr = GroupsGetByProjectPath(projectPath);
             if (gr == null)
                 return;
@@ -428,7 +428,7 @@ namespace UnityEditor.iOS.Xcode
         // Returns null on error
         internal List<string> GetGroupChildrenFiles(string projectPath)
         {
-            projectPath = Utils.FixSlashesInPath(projectPath);
+            projectPath = PBXPath.FixSlashes(projectPath);
             PBXGroupData gr = GroupsGetByProjectPath(projectPath);
             if (gr == null)
                 return null;
@@ -457,7 +457,7 @@ namespace UnityEditor.iOS.Xcode
         /// If sourceGroup is empty or null, root group is returned
         private PBXGroupData CreateSourceGroup(string sourceGroup)
         {
-            sourceGroup = Utils.FixSlashesInPath(sourceGroup);
+            sourceGroup = PBXPath.FixSlashes(sourceGroup);
 
             if (sourceGroup == null || sourceGroup == "")
                 return GroupsGetMainGroup();
@@ -469,7 +469,7 @@ namespace UnityEditor.iOS.Xcode
             // the group does not exist -- create new
             gr = GroupsGetMainGroup();
 
-            var elements = PBX.Utils.SplitPath(sourceGroup);
+            var elements = PBXPath.Split(sourceGroup);
             string projectPath = null;
             foreach (string pathEl in elements)
             {
@@ -497,8 +497,8 @@ namespace UnityEditor.iOS.Xcode
         {
             if (sourceTree == PBXSourceTree.Group)
                 throw new Exception("sourceTree must not be PBXSourceTree.Group");
-            path = Utils.FixSlashesInPath(path);
-            projectPath = Utils.FixSlashesInPath(projectPath);
+            path = PBXPath.FixSlashes(path);
+            projectPath = PBXPath.FixSlashes(projectPath);
 
             // note: we are duplicating products group for the project reference. Otherwise Xcode crashes.
             PBXGroupData productGroup = PBXGroupData.CreateRelative("Products");
@@ -507,7 +507,7 @@ namespace UnityEditor.iOS.Xcode
             PBXFileReferenceData fileRef = PBXFileReferenceData.CreateFromFile(path, Path.GetFileName(projectPath),
                                                                                sourceTree);
             FileRefsAdd(path, projectPath, null, fileRef);
-            CreateSourceGroup(Utils.GetDirectoryFromPath(projectPath)).children.AddGUID(fileRef.guid);
+            CreateSourceGroup(PBXPath.GetDirectory(projectPath)).children.AddGUID(fileRef.guid);
 
             project.project.AddReference(productGroup.guid, fileRef.guid);
         }
@@ -525,8 +525,8 @@ namespace UnityEditor.iOS.Xcode
                                                  string remoteInfo)
         {
             PBXNativeTargetData target = nativeTargets[targetGuid];
-            filename = Utils.FixSlashesInPath(filename);
-            projectPath = Utils.FixSlashesInPath(projectPath);
+            filename = PBXPath.FixSlashes(filename);
+            projectPath = PBXPath.FixSlashes(projectPath);
 
             // find the products group to put the new library in
             string projectGuid = FindFileGuidByRealPath(projectPath);
@@ -732,6 +732,13 @@ namespace UnityEditor.iOS.Xcode
                 return nativeTargets[targetGuid].buildConfigList;
         }
 
+        // Sets the baseConfigurationReference key for a XCBuildConfiguration. 
+        // If the argument is null, the base configuration is removed.
+        internal void SetBaseReferenceForConfig(string configGuid, string baseReference)
+        {
+            buildConfigs[configGuid].baseConfigurationReference = baseReference;
+        }
+
         // Adds an item to a build property that contains a value list. Duplicate build properties
         // are ignored. Values for name "LIBRARY_SEARCH_PATHS" are quoted if they contain spaces.
         // targetGuid may refer to PBXProject object
@@ -832,6 +839,36 @@ namespace UnityEditor.iOS.Xcode
                 UpdateBuildProperty(guid, name, addValues, removeValues);
         }
 
+        internal string ShellScriptByName(string targetGuid, string name)
+        {
+            foreach (var phase in nativeTargets[targetGuid].phases)
+            {
+                var script = shellScripts[phase];
+                if (script != null && script.name == name)
+                    return script.guid;
+            }
+            return null;
+        }
+
+        internal void AppendShellScriptBuildPhase(string targetGuid, string name, string shellPath, string shellScript)
+        {
+            PBXShellScriptBuildPhaseData shellScriptPhase = PBXShellScriptBuildPhaseData.Create(name, shellPath, shellScript);
+
+            shellScripts.AddEntry(shellScriptPhase);
+            nativeTargets[targetGuid].phases.AddGUID(shellScriptPhase.guid);
+        }
+
+        internal void AppendShellScriptBuildPhase(IEnumerable<string> targetGuids, string name, string shellPath, string shellScript)
+        {
+            PBXShellScriptBuildPhaseData shellScriptPhase = PBXShellScriptBuildPhaseData.Create(name, shellPath, shellScript);
+
+            shellScripts.AddEntry(shellScriptPhase);
+            foreach (string guid in targetGuids)
+            {
+                nativeTargets[guid].phases.AddGUID(shellScriptPhase.guid);
+            }
+        }
+
         public void ReadFromFile(string path)
         {
             ReadFromString(File.ReadAllText(path));
@@ -861,6 +898,60 @@ namespace UnityEditor.iOS.Xcode
         public string WriteToString()
         {
             return m_Data.WriteToString();
+        }
+
+        internal PBXProjectObjectData GetProjectInternal()
+        {
+            return project.project;
+        }
+
+        /*
+         * Allows the setting of target attributes in the project section such as Provisioning Style and Team ID for each target
+         *
+         * The Target Attributes are structured like so:
+         * attributes = {
+         *      TargetAttributes = {
+         *          1D6058900D05DD3D006BFB54 = {
+         *              DevelopmentTeam = Z6SFPV59E3;
+         *              ProvisioningStyle = Manual;
+         *          };
+         *          5623C57217FDCB0800090B9E = {
+         *              DevelopmentTeam = Z6SFPV59E3;
+         *              ProvisioningStyle = Manual;
+         *              TestTargetID = 1D6058900D05DD3D006BFB54;
+         *          };
+         *      };
+         *  };
+         */
+        internal void SetTargetAttributes(string key, string value)
+        {
+            PBXElementDict properties = project.project.GetPropertiesRaw();
+            PBXElementDict attributes;
+            PBXElementDict targetAttributes;
+            if (properties.Contains("attributes")) {
+                attributes = properties["attributes"] as PBXElementDict;
+            } else {
+                attributes = properties.CreateDict("attributes");
+            }
+
+            if (attributes.Contains("TargetAttributes")) {
+                targetAttributes = attributes["TargetAttributes"] as PBXElementDict;
+            } else {
+                targetAttributes = attributes.CreateDict("TargetAttributes");
+            }
+
+            foreach (KeyValuePair<string, PBXNativeTargetData> target in nativeTargets.GetEntries()) {
+                PBXElementDict targetAttributesRaw;
+                if (targetAttributes.Contains(target.Key))
+                {
+                    targetAttributesRaw = targetAttributes[target.Key].AsDict();
+                } else {
+                    targetAttributesRaw = targetAttributes.CreateDict(target.Key);
+                }
+                targetAttributesRaw.SetString(key, value); 
+            }
+            project.project.UpdateVars();
+
         }
     }
 

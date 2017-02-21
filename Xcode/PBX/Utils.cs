@@ -195,7 +195,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             { ".storyboard",new FileTypeDesc("file.storyboard",         PBXFileType.Resource) },
             { ".bundle",    new FileTypeDesc("wrapper.plug-in",         PBXFileType.Resource) },
             { ".dylib",     new FileTypeDesc("compiled.mach-o.dylib",   PBXFileType.Framework) },
-            { ".tbd",       new FileTypeDesc("sourcecode.text-based-dylib-definition",   PBXFileType.Framework) }
+            { ".tbd",       new FileTypeDesc("sourcecode.text-based-dylib-definition",  PBXFileType.Framework) }
         };
 
         public static bool IsKnownExtension(string ext)
@@ -283,71 +283,6 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             return new List<PBXSourceTree>{PBXSourceTree.Absolute, PBXSourceTree.Build,
                                            PBXSourceTree.Developer, PBXSourceTree.Sdk, PBXSourceTree.Source};
-        }
-    }
-    
-    internal class Utils
-    {
-        /// Replaces '\' with '/'. We need to apply this function to all paths that come from the user
-        /// of the API because we store paths to pbxproj and on windows we may get path with '\' slashes
-        /// instead of '/' slashes
-        public static string FixSlashesInPath(string path)
-        {
-            if (path == null)
-                return null;
-            return path.Replace('\\', '/');
-        }
-
-        public static void CombinePaths(string path1, PBXSourceTree tree1, string path2, PBXSourceTree tree2,
-                                 out string resPath, out PBXSourceTree resTree)
-        {
-            if (tree2 == PBXSourceTree.Group)
-            {
-                resPath = CombinePaths(path1, path2);
-                resTree = tree1;
-                return;
-            }
-            
-            resPath = path2;
-            resTree = tree2;
-        }
-        
-        public static string CombinePaths(string path1, string path2)
-        {
-            if (path2.StartsWith("/"))
-                return path2;
-            if (path1.EndsWith("/"))
-                return path1 + path2;
-            if (path1 == "")
-                return path2;
-            if (path2 == "")
-                return path1;
-            return path1 + "/" + path2;
-        }
-        
-        public static string GetDirectoryFromPath(string path)
-        {
-            int pos = path.LastIndexOf('/');
-            if (pos == -1)
-                return "";
-            else
-                return path.Substring(0, pos);
-        }
-        
-        public static string GetFilenameFromPath(string path)
-        {
-            int pos = path.LastIndexOf('/');
-            if (pos == -1)
-                return path;
-            else
-                return path.Substring(pos + 1);
-        }
-
-        public static string[] SplitPath(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return new string[]{};
-            return path.Split(new[]{'/'}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
