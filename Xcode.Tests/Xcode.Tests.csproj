@@ -33,6 +33,7 @@
     <Compile Include="PBXProjectTests.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="ProjectCapabilityManagerTests.cs" />
+    <Compile Include="XcSchemeTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
