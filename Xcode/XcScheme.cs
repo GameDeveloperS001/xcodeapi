@@ -12,6 +12,18 @@ namespace UnityEditor.iOS.Xcode
     {
         XDocument m_Doc;
 
+        // Returns the current build configuration. Returns null if it is not set.
+        public string GetBuildConfiguration()
+        {
+            var el = m_Doc.Root.XPathSelectElement("./LaunchAction");
+            if (el == null)
+                throw new Exception("The xcscheme document does not contain build configuration setting");
+            var attr = el.Attribute("buildConfiguration");
+            if (attr == null)
+                return null;
+            return attr.Value;
+        }
+
         public void SetBuildConfiguration(string buildConfigName)
         {
             var el = m_Doc.Root.XPathSelectElement("./LaunchAction");

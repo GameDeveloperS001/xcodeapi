@@ -14,6 +14,16 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
+        public void ChangingBuildConfigurationWorks()
+        {
+            var xcscheme = new XcScheme();
+            xcscheme.ReadFromString(ReadSourceFile("base1.xcscheme"));
+            Assert.AreEqual("Debug", xcscheme.GetBuildConfiguration());
+            xcscheme.SetBuildConfiguration("MyConfiguration");
+            Assert.AreEqual("MyConfiguration", xcscheme.GetBuildConfiguration());
+        }
+
+        [Test]
         public void OutputWorks()
         {
             TestXmlUpdate("base1.xcscheme", "test1.xcscheme", text => 
