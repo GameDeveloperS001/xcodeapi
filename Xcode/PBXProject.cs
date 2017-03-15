@@ -1009,6 +1009,64 @@ namespace UnityEditor.iOS.Xcode
             buildConfigs[configGuid].baseConfigurationReference = baseReference;
         }
 
+        private PBXCopyFilesBuildPhaseData FindEmbedFrameworkPhase()
+        {
+            foreach(var p in copyFiles.GetObjects())
+            {
+                if (p.name == "Embed Frameworks")
+                    return p;
+            }
+            return null;
+        }
+
+        private PBXBuildFileData FindFrameworkByFileGuid(PBXCopyFilesBuildPhaseData phase, string fileGuid)
+        {
+            foreach (string buildFileDataGuid in phase.files)
+            {
+                var buildFile = BuildFilesGet(buildFileDataGuid);
+                if (buildFile.fileRef == fileGuid)
+                    return buildFile;
+            }
+            return null;
+        }
+
+        // Embeds Framework to the project. 
+        // Creates a copy phase called 'Embed Frameworks', adds 'filename' framework there and sets LD_RUNPATH_SEARCH_PATHS to "$(inherited) @executable_path/Frameworks
+        public void EmbedFramework(string targetGuid, string fileGuid)
+        {
+            PBXNativeTargetData target = nativeTargets[targetGuid];
+
+            PBXBuildFileData frameworkEmbedFileData = null;
+
+            var embedFrameworkPhase = FindEmbedFrameworkPhase();
+            if (embedFrameworkPhase == null)
+            {
+                embedFrameworkPhase = PBXCopyFilesBuildPhaseData.Create("Embed Frameworks", "10");
+                copyFiles.AddEntry(embedFrameworkPhase);
+                target.phases.AddGUID(embedFrameworkPhase.guid);
+            }
+            else
+            {
+                frameworkEmbedFileData = FindFrameworkByFileGuid(embedFrameworkPhase, fileGuid);
+            }
+
+            if (frameworkEmbedFileData == null)
+            {
+                frameworkEmbedFileData = PBXBuildFileData.CreateFromFile(fileGuid, false, null);
+                BuildFilesAdd(targetGuid, frameworkEmbedFileData);
+
+                embedFrameworkPhase.files.AddGUID(frameworkEmbedFileData.guid);
+            }
+
+            frameworkEmbedFileData.codeSignOnCopy = true;
+            frameworkEmbedFileData.removeHeadersOnCopy = true;
+            
+            // not sure why but just setting codeSignOnCopy/removeHeadersOnCopy doesn't work - need to call AddCodeSignOnCopy
+            frameworkEmbedFileData.AddCodeSignOnCopy();
+                
+            AddBuildProperty(targetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+        }
+
         /// <summary>
         /// Adds a value to build property list in all build configurations for the specified target.
         /// Duplicate build properties are ignored. Values for names "LIBRARY_SEARCH_PATHS" and 

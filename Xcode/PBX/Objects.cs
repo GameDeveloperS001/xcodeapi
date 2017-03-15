@@ -88,6 +88,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         public string fileRef;
         public string compileFlags;
         public bool weak;
+        public bool codeSignOnCopy;
+        public bool removeHeadersOnCopy;
         public List<string> assetTags;
         
         private static PropertyCommentChecker checkerData = new PropertyCommentChecker(new string[]{
@@ -105,10 +107,57 @@ namespace UnityEditor.iOS.Xcode.PBX
             buildFile.fileRef = fileRefGUID;
             buildFile.compileFlags = compileFlags;
             buildFile.weak = weak;
+            buildFile.codeSignOnCopy = false;
+            buildFile.removeHeadersOnCopy = false;
             buildFile.assetTags = new List<string>();
             return buildFile;
         }
         
+        void UpdatePropsAttribute(PBXElementDict settings, bool v, string attributeName)
+        {
+            if (v)
+            {
+                if (settings == null)
+                    settings = m_Properties.CreateDict("settings");
+                PBXElementArray attrs = null;
+                if (settings.Contains("ATTRIBUTES"))
+                    attrs = settings["ATTRIBUTES"].AsArray();
+                else
+                    attrs = settings.CreateArray("ATTRIBUTES");
+                    
+                bool exists = false;
+                foreach (var value in attrs.values)
+                {
+                    if (value is PBXElementString && value.AsString() == attributeName)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    attrs.AddString(attributeName);
+            }
+            else
+            {
+                if (settings != null && settings.Contains("ATTRIBUTES"))
+                {
+                    var attrs = settings["ATTRIBUTES"].AsArray();
+                    attrs.values.RemoveAll(el => (el is PBXElementString && el.AsString() == attributeName));
+                    if (attrs.values.Count == 0)
+                        settings.Remove("ATTRIBUTES");
+                }
+            }
+        }
+
+        public void AddCodeSignOnCopy()
+        {
+            codeSignOnCopy = true;
+            removeHeadersOnCopy = true;
+
+            UpdatePropsAttribute(settings, codeSignOnCopy, "CodeSignOnCopy");
+            UpdatePropsAttribute(settings, removeHeadersOnCopy, "RemoveHeadersOnCopy");
+        }
+
         public override void UpdateProps()
         {
             SetPropertyString("fileRef", fileRef);
@@ -129,35 +178,9 @@ namespace UnityEditor.iOS.Xcode.PBX
                     settings.Remove("COMPILER_FLAGS");
             }
 
-            if (weak)
-            {
-                if (settings == null)
-                    settings = m_Properties.CreateDict("settings");
-                PBXElementArray attrs = null;
-                if (settings.Contains("ATTRIBUTES"))
-                    attrs = settings["ATTRIBUTES"].AsArray();
-                else
-                    attrs = settings.CreateArray("ATTRIBUTES");
-                    
-                bool exists = false;
-                foreach (var value in attrs.values)
-                {
-                    if (value is PBXElementString && value.AsString() == "Weak")
-                        exists = true;
-                }
-                if (!exists)
-                    attrs.AddString("Weak");
-            }
-            else
-            {
-                if (settings != null && settings.Contains("ATTRIBUTES"))
-                {
-                    var attrs = settings["ATTRIBUTES"].AsArray();
-                    attrs.values.RemoveAll(el => (el is PBXElementString && el.AsString() == "Weak"));
-                    if (attrs.values.Count == 0)
-                        settings.Remove("ATTRIBUTES");
-                }
-            }
+            UpdatePropsAttribute(settings, weak, "Weak");
+            UpdatePropsAttribute(settings, codeSignOnCopy, "CodeSignOnCopy");
+            UpdatePropsAttribute(settings, removeHeadersOnCopy, "RemoveHeadersOnCopy");
             
             if (assetTags.Count > 0)
             {
@@ -196,6 +219,10 @@ namespace UnityEditor.iOS.Xcode.PBX
                     {
                         if (value is PBXElementString && value.AsString() == "Weak")
                             weak = true;
+                        if (value is PBXElementString && value.AsString() == "CodeSignOnCopy")
+                            codeSignOnCopy = true;
+                        if (value is PBXElementString && value.AsString() == "RemoveHeadersOnCopy")
+                            removeHeadersOnCopy = true;
                     }
                 }
                 if (dict.Contains("ASSET_TAGS"))
