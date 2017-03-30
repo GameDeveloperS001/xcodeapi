@@ -43,7 +43,7 @@ namespace UnityEditor.iOS.Xcode
         }
 
         // Add the iCloud capability with the desired options.
-        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, string[] customContainers)
+        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, bool cloudKit, string[] customContainers)
         {
             var ent = GetOrCreateEntitlementDoc();
             var val = (ent.root[ICloudEntitlements.ContainerIdKey] = new PlistElementArray()) as PlistElementArray;
@@ -51,7 +51,8 @@ namespace UnityEditor.iOS.Xcode
             {
                 val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
                 var ser = (ent.root[ICloudEntitlements.ServicesKey] = new PlistElementArray()) as PlistElementArray;
-                ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
+                if (cloudKit)
+                    ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
                 ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesDocValue));
                 var ubiquity = (ent.root[ICloudEntitlements.UbiquityContainerIdKey] = new PlistElementArray()) as PlistElementArray;
                 ubiquity.values.Add(new PlistElementString(ICloudEntitlements.UbiquityContainerIdValue));
