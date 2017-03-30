@@ -46,7 +46,7 @@ namespace UnityEditor.iOS.Xcode
         public void AddiCloud(bool keyValueStorage, bool iCloudDocument, string[] customContainers)
         {
             var ent = GetOrCreateEntitlementDoc();
-            var val = (ent.root[ICloudEntitlements.ContainerIdValue] = new PlistElementArray()) as PlistElementArray;
+            var val = (ent.root[ICloudEntitlements.ContainerIdKey] = new PlistElementArray()) as PlistElementArray;
             if (iCloudDocument)
             {
                 val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
