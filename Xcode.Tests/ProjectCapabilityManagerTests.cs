@@ -25,7 +25,7 @@ namespace UnityEditor.iOS.Xcode.Tests
 
             proj.WriteToFile(outputFile);
             Assert.IsTrue(TestUtils.FileContentsEqual(outputFile, sourceFile),
-                          "Output not equivalent to the expected output");
+                          string.Format("Output not equivalent to the expected output ({0}, {1})", outputFile, sourceFile));
 
             PBXProject other = new PBXProject();
             other.ReadFromFile(outputFile);
@@ -80,17 +80,101 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddiCloudWorks()
+        public void AddiCloudKVWorks()
         {
             SetupTestProject();
             ResetGuidGenerator();
 
             var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
-            capManager.AddiCloud(true, false, new string[] {});
+            capManager.AddiCloud(true, false, false, true, new string[] {});
             capManager.WriteToFile();
 
             TestOutputProject(capManager.project, "add_icloud.pbxproj");
-            TestOutput("test.entitlements", "add_icloud.entitlements");
+            TestOutput("test.entitlements", "add_icloud_kv.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudDocumentWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(false, true, false, true, new string[] {});
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_doc.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudDocumentCustomWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(false, true, false, true, new string[] { "iCloud.custom.container.$(CFBundleIdentifier)" });
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_doc_custom.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudCloudKitWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(false, false, true, true, new string[] { });
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud_cloudkit.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_cloudkit.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudCloudKitCustomWorks()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(false, false, true, true, new string[] { "iCloud.custom.container.$(CFBundleIdentifier)" });
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud_cloudkit.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_cloudkit_custom.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudAll()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(true, true, true, true, new string[] { });
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud_cloudkit.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_all.entitlements");
+        }
+
+        [Test]
+        public void AddiCloudAllCustom()
+        {
+            SetupTestProject();
+            ResetGuidGenerator();
+
+            var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
+            capManager.AddiCloud(true, true, true, true, new string[] { "iCloud.custom.container.$(CFBundleIdentifier)" });
+            capManager.WriteToFile();
+
+            TestOutputProject(capManager.project, "add_icloud_cloudkit.pbxproj");
+            TestOutput("test.entitlements", "add_icloud_all_custom.entitlements");
         }
 
         [Test]
@@ -353,7 +437,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             ResetGuidGenerator();
 
             var capManager = new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(GetTestOutputPath()), "test.entitlements", PBXProject.GetUnityTargetName());
-            capManager.AddiCloud(true, false, new string[] {});
+            capManager.AddiCloud(true, false, false, true, new string[] {});
             capManager.AddApplePay(new string[] {"test1", "test2"});
             capManager.AddSiri();
             capManager.WriteToFile();
