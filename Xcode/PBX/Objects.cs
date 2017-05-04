@@ -112,36 +112,35 @@ namespace UnityEditor.iOS.Xcode.PBX
             buildFile.assetTags = new List<string>();
             return buildFile;
         }
-        
-        void UpdatePropsAttribute(PBXElementDict settings, bool v, string attributeName)
+
+        void UpdatePropsAttribute(PBXElementDict settings, bool value, string attributeName)
         {
-            if (v)
+            PBXElementArray attrs = null;
+            if (value)
             {
                 if (settings == null)
                     settings = m_Properties.CreateDict("settings");
-                PBXElementArray attrs = null;
-                if (settings.Contains("ATTRIBUTES"))
-                    attrs = settings["ATTRIBUTES"].AsArray();
-                else
+            }
+            if (settings != null && settings.Contains("ATTRIBUTES"))
+                attrs = settings["ATTRIBUTES"].AsArray();
+
+            if (value)
+            {
+                if (attrs == null)
                     attrs = settings.CreateArray("ATTRIBUTES");
-                    
-                bool exists = false;
-                foreach (var value in attrs.values)
+
+                bool exists = attrs.values.Any(attr => 
                 {
-                    if (value is PBXElementString && value.AsString() == attributeName)
-                    {
-                        exists = true;
-                        break;
-                    }
-                }
+                    return attr is PBXElementString && attr.AsString() == attributeName;
+                });
+
                 if (!exists)
                     attrs.AddString(attributeName);
             }
             else
             {
-                if (settings != null && settings.Contains("ATTRIBUTES"))
+                if (attrs != null)
                 {
-                    var attrs = settings["ATTRIBUTES"].AsArray();
                     attrs.values.RemoveAll(el => (el is PBXElementString && el.AsString() == attributeName));
                     if (attrs.values.Count == 0)
                         settings.Remove("ATTRIBUTES");
