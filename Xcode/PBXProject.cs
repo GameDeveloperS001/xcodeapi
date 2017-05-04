@@ -1041,7 +1041,7 @@ namespace UnityEditor.iOS.Xcode
             var embedFrameworkPhase = FindEmbedFrameworkPhase();
             if (embedFrameworkPhase == null)
             {
-                embedFrameworkPhase = PBXCopyFilesBuildPhaseData.Create("Embed Frameworks", "10");
+                embedFrameworkPhase = PBXCopyFilesBuildPhaseData.Create("Embed Frameworks", "", "10");
                 copyFiles.AddEntry(embedFrameworkPhase);
                 target.phases.AddGUID(embedFrameworkPhase.guid);
             }
