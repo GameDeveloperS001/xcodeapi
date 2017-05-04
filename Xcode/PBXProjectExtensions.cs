@@ -375,5 +375,39 @@ namespace UnityEditor.iOS.Xcode.Extensions
             // add to products folder
             productGroup.children.AddGUID(libRef.guid);
         }
+
+        // Embeds Framework to the project. 
+        // Creates a copy phase called 'Embed Frameworks', adds 'filename' framework there and sets LD_RUNPATH_SEARCH_PATHS to "$(inherited) @executable_path/Frameworks
+        public static void EmbedFramework(this PBXProject proj, string targetGuid, string fileGuid)
+        {
+            PBXNativeTargetData target = proj.nativeTargets[targetGuid];
+
+            PBXBuildFileData frameworkEmbedFileData = null;
+
+            var embedFrameworkPhase = proj.FindEmbedFrameworkPhase();
+            if (embedFrameworkPhase == null)
+            {
+                embedFrameworkPhase = PBXCopyFilesBuildPhaseData.Create("Embed Frameworks", "", "10");
+                proj.copyFiles.AddEntry(embedFrameworkPhase);
+                target.phases.AddGUID(embedFrameworkPhase.guid);
+            }
+            else
+            {
+                frameworkEmbedFileData = proj.FindFrameworkByFileGuid(embedFrameworkPhase, fileGuid);
+            }
+
+            if (frameworkEmbedFileData == null)
+            {
+                frameworkEmbedFileData = PBXBuildFileData.CreateFromFile(fileGuid, false, null);
+                proj.BuildFilesAdd(targetGuid, frameworkEmbedFileData);
+
+                embedFrameworkPhase.files.AddGUID(frameworkEmbedFileData.guid);
+            }
+
+            frameworkEmbedFileData.codeSignOnCopy = true;
+            frameworkEmbedFileData.removeHeadersOnCopy = true;
+
+            proj.AddBuildProperty(targetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
+        }
     }
 } // namespace UnityEditor.iOS.Xcode
