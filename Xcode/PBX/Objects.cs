@@ -113,7 +113,7 @@ namespace UnityEditor.iOS.Xcode.PBX
             return buildFile;
         }
 
-        void UpdatePropsAttribute(PBXElementDict settings, bool value, string attributeName)
+        PBXElementDict UpdatePropsAttribute(PBXElementDict settings, bool value, string attributeName)
         {
             PBXElementArray attrs = null;
             if (value)
@@ -146,6 +146,7 @@ namespace UnityEditor.iOS.Xcode.PBX
                         settings.Remove("ATTRIBUTES");
                 }
             }
+            return settings;
         }
 
         public override void UpdateProps()
@@ -168,9 +169,9 @@ namespace UnityEditor.iOS.Xcode.PBX
                     settings.Remove("COMPILER_FLAGS");
             }
 
-            UpdatePropsAttribute(settings, weak, "Weak");
-            UpdatePropsAttribute(settings, codeSignOnCopy, "CodeSignOnCopy");
-            UpdatePropsAttribute(settings, removeHeadersOnCopy, "RemoveHeadersOnCopy");
+            settings = UpdatePropsAttribute(settings, weak, "Weak");
+            settings = UpdatePropsAttribute(settings, codeSignOnCopy, "CodeSignOnCopy");
+            settings = UpdatePropsAttribute(settings, removeHeadersOnCopy, "RemoveHeadersOnCopy");
             
             if (assetTags.Count > 0)
             {
