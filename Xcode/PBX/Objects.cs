@@ -149,15 +149,6 @@ namespace UnityEditor.iOS.Xcode.PBX
             }
         }
 
-        public void AddCodeSignOnCopy()
-        {
-            codeSignOnCopy = true;
-            removeHeadersOnCopy = true;
-
-            UpdatePropsAttribute(settings, codeSignOnCopy, "CodeSignOnCopy");
-            UpdatePropsAttribute(settings, removeHeadersOnCopy, "RemoveHeadersOnCopy");
-        }
-
         public override void UpdateProps()
         {
             SetPropertyString("fileRef", fileRef);

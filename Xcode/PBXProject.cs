@@ -1060,10 +1060,7 @@ namespace UnityEditor.iOS.Xcode
 
             frameworkEmbedFileData.codeSignOnCopy = true;
             frameworkEmbedFileData.removeHeadersOnCopy = true;
-            
-            // not sure why but just setting codeSignOnCopy/removeHeadersOnCopy doesn't work - need to call AddCodeSignOnCopy
-            frameworkEmbedFileData.AddCodeSignOnCopy();
-                
+
             AddBuildProperty(targetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
         }
 
