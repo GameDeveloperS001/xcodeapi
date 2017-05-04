@@ -632,6 +632,31 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
+        public void AddEmbedFrameworkWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+
+            // first, include a framework as a regular file
+            var fileGuid = proj.AddFile("path/test.framework", "Frameworks/test.framework");
+            Assert.AreEqual("CCCCCCCC0000000000000001", fileGuid);
+
+            proj.EmbedFramework(target, fileGuid);
+            Assert.IsNotNull(proj.FindEmbedFrameworkPhase());
+
+            proj = Reserialize(proj);
+
+            var buildFile = proj.BuildFilesGetForSourceFile(target, fileGuid);
+            Assert.IsNotNull(buildFile);
+            Assert.IsTrue(buildFile.codeSignOnCopy);
+            Assert.IsTrue(buildFile.removeHeadersOnCopy);
+
+            var copyPhase = proj.FindEmbedFrameworkPhase();
+            Assert.IsTrue(copyPhase.files.Contains(buildFile.guid));
+        }
+
+        [Test]
         public void StrippedProjectReadingWorks()
         {
             PBXProject proj = ReadPBXProject("base_stripped.pbxproj");
