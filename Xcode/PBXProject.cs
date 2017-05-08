@@ -934,6 +934,22 @@ namespace UnityEditor.iOS.Xcode
         }
 
         /// <summary>
+        /// Returns the GUID of sources build phase for the given target.
+        /// </summary>
+        /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string SourcesBuildPhaseByTarget(string targetGuid)
+        {
+            var target = nativeTargets[targetGuid];
+            foreach (var phaseGuid in target.phases) {
+                var phaseAny = BuildSectionAny(phaseGuid);
+                if (phaseAny is PBXSourcesBuildPhaseData)
+                    return phaseGuid;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Creates a new sources build phase for given target.
         /// The new phase is placed at the end of the list of build phases configured for the target.
         /// </summary>
@@ -945,6 +961,22 @@ namespace UnityEditor.iOS.Xcode
             sources.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
             return phase.guid;
+        }
+
+        /// <summary>
+        /// Returns the GUID of resources build phase for the given target.
+        /// </summary>
+        /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string ResourcesBuildPhaseByTarget(string targetGuid)
+        {
+            var target = nativeTargets[targetGuid];
+            foreach (var phaseGuid in target.phases) {
+                var phaseAny = BuildSectionAny(phaseGuid);
+                if (phaseAny is PBXResourcesBuildPhaseData)
+                    return phaseGuid;
+            }
+            return null;
         }
 
         /// <summary>
@@ -962,6 +994,22 @@ namespace UnityEditor.iOS.Xcode
         }
 
         /// <summary>
+        /// Returns the GUID of frameworks build phase for the given target.
+        /// </summary>
+        /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        public string FrameworksBuildPhaseByTarget(string targetGuid)
+        {
+            var target = nativeTargets[targetGuid];
+            foreach (var phaseGuid in target.phases) {
+                var phaseAny = BuildSectionAny(phaseGuid);
+                if (phaseAny is PBXFrameworksBuildPhaseData)
+                    return phaseGuid;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Creates a new frameworks build phase for given target.
         /// The new phase is placed at the end of the list of build phases configured for the target.
         /// </summary>
@@ -973,6 +1021,37 @@ namespace UnityEditor.iOS.Xcode
             frameworks.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
             return phase.guid;
+        }
+
+        /// <summary>
+        /// Returns the GUID of matching copy files build phase for the given target.
+        /// The parameters of existing copy files build phase are matched to the arguments of this
+        /// function and the GUID of the phase is returned only if a matching build phase is found.
+        /// </summary>
+        /// <returns>Returns the GUID of the matching phase or null if it does not exist.</returns>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="name">The name of the phase.</param>
+        /// <param name="dstPath">The destination path.</param>
+        /// <param name="subfolderSpec">The "subfolder spec". The following usages are known:
+        /// - "10" for embedding frameworks
+        /// - "13" for embedding app extension content
+        /// - "16" for embedding watch content</param>
+        public string CopyFilesBuildPhaseByTarget(string targetGuid, string name, string dstPath, string subfolderSpec)
+        {
+            var target = nativeTargets[targetGuid];
+            foreach (var phaseGuid in target.phases) {
+                var phaseAny = BuildSectionAny(phaseGuid);
+                if (phaseAny is PBXCopyFilesBuildPhaseData)
+                {
+                    var copyPhase = (PBXCopyFilesBuildPhaseData) phaseAny;
+                    if (copyPhase.name == name && copyPhase.dstPath == dstPath && 
+                        copyPhase.dstSubfolderSpec == subfolderSpec)
+                    {
+                        return phaseGuid;
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>
