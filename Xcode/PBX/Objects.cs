@@ -559,6 +559,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         internal override PropertyCommentChecker checker { get { return checkerData; } }
 
         public string name;
+        public string dstPath;
+        public string dstSubfolderSpec;
 
         // name may be null
         public static PBXCopyFilesBuildPhaseData Create(string name, string dstPath, string subfolderSpec)
@@ -567,8 +569,8 @@ namespace UnityEditor.iOS.Xcode.PBX
             res.guid = PBXGUID.Generate();
             res.SetPropertyString("isa", "PBXCopyFilesBuildPhase");
             res.SetPropertyString("buildActionMask", "2147483647");
-            res.SetPropertyString("dstPath", dstPath);
-            res.SetPropertyString("dstSubfolderSpec", subfolderSpec);
+            res.dstPath = dstPath;
+            res.dstSubfolderSpec = subfolderSpec;
             res.files = new List<string>();
             res.SetPropertyString("runOnlyForDeploymentPostprocessing", "0");
             res.name = name;
@@ -579,11 +581,16 @@ namespace UnityEditor.iOS.Xcode.PBX
         {
             SetPropertyList("files", files);
             SetPropertyString("name", name);
+            SetPropertyString("dstPath", dstPath);
+            SetPropertyString("dstSubfolderSpec", dstSubfolderSpec);
         }
+
         public override void UpdateVars()
         {
             files = GetPropertyList("files");
             name = GetPropertyString("name");
+            dstPath = GetPropertyString("dstPath");
+            dstSubfolderSpec = GetPropertyString("dstSubfolderSpec");
         }
     }
 
