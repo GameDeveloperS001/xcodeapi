@@ -376,38 +376,40 @@ namespace UnityEditor.iOS.Xcode.Extensions
             productGroup.children.AddGUID(libRef.guid);
         }
 
-        // Embeds Framework to the project. 
-        // Creates a copy phase called 'Embed Frameworks', adds 'filename' framework there and sets LD_RUNPATH_SEARCH_PATHS to "$(inherited) @executable_path/Frameworks
-        public static void EmbedFramework(this PBXProject proj, string targetGuid, string fileGuid)
+        /// <summary>
+        /// Configures file for embed framework section for the given native target.
+        ///
+        /// This function also internally calls <code>proj.AddFileToBuild(targetGuid, fileGuid)</code>
+        /// to ensure that the framework is added to the list of linked frameworks.
+        ///
+        /// If the target has already configured the given file as embedded framework, this function has
+        /// no effect.
+        ///
+        /// A projects containing multiple native targets, a single file or folder reference can be
+        /// configured to be built in all, some or none of the targets. The file or folder reference is
+        /// added to appropriate build section depending on the file extension.
+        /// </summary>
+        /// <param name="proj">A project passed as this argument.</param>
+        /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
+        /// <param name="fileGuid">The file guid returned by [[AddFile]] or [[AddFolderReference]].</param>
+        public static void AddFileToEmbedFrameworks(this PBXProject proj, string targetGuid, string fileGuid)
         {
             PBXNativeTargetData target = proj.nativeTargets[targetGuid];
 
-            PBXBuildFileData frameworkEmbedFileData = null;
-
-            var embedFrameworkPhase = proj.FindEmbedFrameworkPhase();
-            if (embedFrameworkPhase == null)
-            {
-                embedFrameworkPhase = PBXCopyFilesBuildPhaseData.Create("Embed Frameworks", "", "10");
-                proj.copyFiles.AddEntry(embedFrameworkPhase);
-                target.phases.AddGUID(embedFrameworkPhase.guid);
-            }
-            else
-            {
-                frameworkEmbedFileData = proj.FindFrameworkByFileGuid(embedFrameworkPhase, fileGuid);
-            }
+            var phaseGuid = proj.AddCopyFilesBuildPhase(targetGuid, "Embed Frameworks", "", "10");
+            var phase = proj.copyFiles[phaseGuid];
+            var frameworkEmbedFileData = proj.FindFrameworkByFileGuid(phase, fileGuid);
 
             if (frameworkEmbedFileData == null)
             {
                 frameworkEmbedFileData = PBXBuildFileData.CreateFromFile(fileGuid, false, null);
                 proj.BuildFilesAdd(targetGuid, frameworkEmbedFileData);
 
-                embedFrameworkPhase.files.AddGUID(frameworkEmbedFileData.guid);
+                phase.files.AddGUID(frameworkEmbedFileData.guid);
             }
 
             frameworkEmbedFileData.codeSignOnCopy = true;
             frameworkEmbedFileData.removeHeadersOnCopy = true;
-
-            proj.AddBuildProperty(targetGuid, "LD_RUNPATH_SEARCH_PATHS", "$(inherited) @executable_path/Frameworks");
         }
     }
 } // namespace UnityEditor.iOS.Xcode

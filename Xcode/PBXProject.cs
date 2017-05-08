@@ -1113,16 +1113,6 @@ namespace UnityEditor.iOS.Xcode
             buildConfigs[configGuid].baseConfigurationReference = baseReference;
         }
 
-        internal PBXCopyFilesBuildPhaseData FindEmbedFrameworkPhase()
-        {
-            foreach(var p in copyFiles.GetObjects())
-            {
-                if (p.name == "Embed Frameworks")
-                    return p;
-            }
-            return null;
-        }
-
         internal PBXBuildFileData FindFrameworkByFileGuid(PBXCopyFilesBuildPhaseData phase, string fileGuid)
         {
             foreach (string buildFileDataGuid in phase.files)

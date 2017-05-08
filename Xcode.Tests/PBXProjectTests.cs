@@ -682,8 +682,8 @@ namespace UnityEditor.iOS.Xcode.Tests
             var fileGuid = proj.AddFile("path/test.framework", "Frameworks/test.framework");
             Assert.AreEqual("CCCCCCCC0000000000000001", fileGuid);
 
-            proj.EmbedFramework(target, fileGuid);
-            Assert.IsNotNull(proj.FindEmbedFrameworkPhase());
+            proj.AddFileToEmbedFrameworks(target, fileGuid);
+            Assert.IsNotNull(proj.CopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10"));
 
             proj = Reserialize(proj);
 
@@ -692,8 +692,8 @@ namespace UnityEditor.iOS.Xcode.Tests
             Assert.IsTrue(buildFile.codeSignOnCopy);
             Assert.IsTrue(buildFile.removeHeadersOnCopy);
 
-            var copyPhase = proj.FindEmbedFrameworkPhase();
-            Assert.IsTrue(copyPhase.files.Contains(buildFile.guid));
+            var copyPhaseGuid = proj.CopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10");
+            Assert.IsTrue(proj.copyFiles[copyPhaseGuid].files.Contains(buildFile.guid));
         }
 
         [Test]
