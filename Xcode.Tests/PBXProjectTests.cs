@@ -556,7 +556,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddTargetWorks()
+        public void AddTargetOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -585,7 +585,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddBuildPhasesWorks()
+        public void AddBuildPhasesOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -598,7 +598,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddAppExtensionWorks()
+        public void AddAppExtensionOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -609,7 +609,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddWatchExtensionWorks()
+        public void AddWatchExtensionOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -620,7 +620,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddWatchAppAndExtensionWorks()
+        public void AddWatchAppAndExtensionOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -662,23 +662,23 @@ namespace UnityEditor.iOS.Xcode.Tests
             PBXProject proj = ReadPBXProject("base_stripped.pbxproj");
             TestOutput(proj, "stripped1.pbxproj");
         }
-        
+
         [Test]
-        public void UnknownFileTypesWork()
+        public void UnknownFileTypesOutputIsExpected()
         {
             PBXProject proj = ReadPBXProject("base_unknown.pbxproj");
             TestOutput(proj, "unknown1.pbxproj");
         }
-        
+
         [Test]
-        public void InvalidProjectRepairWorks()
+        public void InvalidProjectRepairOutputIsExpected()
         {
             PBXProject proj = ReadPBXProject("base_repair.pbxproj");
             TestOutput(proj, "repair1.pbxproj");
         }
 
         [Test]
-        public void AddCapabilityWorks()
+        public void AddCapabilityOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -688,7 +688,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddCapabilityWithEntitlementWorks()
+        public void AddCapabilityWithEntitlementOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -698,7 +698,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddMultipleCapabilitiesWorks()
+        public void AddMultipleCapabilitiesOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -710,7 +710,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void AddMultipleCapabilitiesWithEntitlementWorks()
+        public void AddMultipleCapabilitiesWithEntitlementOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
@@ -722,7 +722,7 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
-        public void SetTeamIdWorks()
+        public void SetTeamIdOutputIsExpected()
         {
             ResetGuidGenerator();
             PBXProject proj = ReadPBXProject();
