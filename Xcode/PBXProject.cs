@@ -951,12 +951,18 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Creates a new sources build phase for given target.
-        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// If the target already has sources build phase configured for it, the function returns the
+        /// existing phase. The new phase is placed at the end of the list of build phases configured 
+        /// for the target.
         /// </summary>
         /// <returns>Returns the GUID of the new phase.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddSourcesBuildPhase(string targetGuid)
         {
+            var phaseGuid = SourcesBuildPhaseByTarget(targetGuid);
+            if (phaseGuid != null)
+                return phaseGuid;
+
             var phase = PBXSourcesBuildPhaseData.Create();
             sources.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
@@ -981,12 +987,18 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Creates a new resources build phase for given target.
-        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// If the target already has resources build phase configured for it, the function returns the
+        /// existing phase. The new phase is placed at the end of the list of build phases configured 
+        /// for the target.
         /// </summary>
         /// <returns>Returns the GUID of the new phase.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddResourcesBuildPhase(string targetGuid)
         {
+            var phaseGuid = ResourcesBuildPhaseByTarget(targetGuid);
+            if (phaseGuid != null)
+                return phaseGuid;
+
             var phase = PBXResourcesBuildPhaseData.Create();
             resources.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
@@ -1011,12 +1023,18 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Creates a new frameworks build phase for given target.
-        /// The new phase is placed at the end of the list of build phases configured for the target.
+        /// If the target already has frameworks build phase configured for it, the function returns the
+        /// existing phase. The new phase is placed at the end of the list of build phases configured 
+        /// for the target.
         /// </summary>
         /// <returns>Returns the GUID of the new phase.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddFrameworksBuildPhase(string targetGuid)
         {
+            var phaseGuid = FrameworksBuildPhaseByTarget(targetGuid);
+            if (phaseGuid != null)
+                return phaseGuid;
+
             var phase = PBXFrameworksBuildPhaseData.Create();
             frameworks.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);
@@ -1056,6 +1074,8 @@ namespace UnityEditor.iOS.Xcode
 
         /// <summary>
         /// Creates a new copy files build phase for given target.
+        /// If the target already has copy files build phase with the same name, dstPath and subfolderSpec 
+        /// configured for it, the function returns the existing phase. 
         /// The new phase is placed at the end of the list of build phases configured for the target.
         /// </summary>
         /// <returns>Returns the GUID of the new phase.</returns>
@@ -1063,10 +1083,15 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="name">The name of the phase.</param>
         /// <param name="dstPath">The destination path.</param>
         /// <param name="subfolderSpec">The "subfolder spec". The following usages are known:
+        /// - "10" for embedding frameworks
         /// - "13" for embedding app extension content
         /// - "16" for embedding watch content</param>
         public string AddCopyFilesBuildPhase(string targetGuid, string name, string dstPath, string subfolderSpec)
         {
+            var phaseGuid = CopyFilesBuildPhaseByTarget(targetGuid, name, dstPath, subfolderSpec);
+            if (phaseGuid != null)
+                return phaseGuid;
+
             var phase = PBXCopyFilesBuildPhaseData.Create(name, dstPath, subfolderSpec);
             copyFiles.AddEntry(phase);
             nativeTargets[targetGuid].phases.AddGUID(phase.guid);

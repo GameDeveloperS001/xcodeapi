@@ -598,6 +598,46 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
+        public void AddBuildPhasesReturnsExistingBuildPhase()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject();
+            string target = proj.AddTarget("TestTarget", ".dylib", "test.type");
+
+            Assert.IsNull(proj.SourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000005", proj.AddSourcesBuildPhase(target));
+            Assert.AreEqual("CCCCCCCC0000000000000005", proj.SourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000005", proj.AddSourcesBuildPhase(target));
+
+            Assert.IsNull(proj.ResourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.ResourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
+
+            Assert.IsNull(proj.FrameworksBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000007", proj.AddFrameworksBuildPhase(target));
+            Assert.AreEqual("CCCCCCCC0000000000000007", proj.FrameworksBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000007", proj.AddFrameworksBuildPhase(target));
+
+            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000008", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000008", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000008", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "13"));
+
+            // check whether all parameters are actually matched against existing phases
+            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
+            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
+            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
+
+            Assert.AreEqual("CCCCCCCC0000000000000009", proj.AddCopyFilesBuildPhase(target, "Copy files2", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000009", proj.CopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000010", proj.AddCopyFilesBuildPhase(target, "Copy files", "path", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000010", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000011", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "14"));
+            Assert.AreEqual("CCCCCCCC0000000000000011", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
+        }
+
+        [Test]
         public void AddAppExtensionOutputIsExpected()
         {
             ResetGuidGenerator();
