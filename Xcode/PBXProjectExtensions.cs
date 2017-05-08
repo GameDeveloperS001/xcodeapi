@@ -3,9 +3,17 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System;
+#if UNITY_XCODE_API_BUILD
 using UnityEditor.iOS.Xcode.PBX;
+#else
+using UnityEditor.iOS.Xcode.Custom.PBX;
+#endif
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode.Extensions
+#else
+namespace UnityEditor.iOS.Xcode.Custom.Extensions
+#endif
 {
     /*  This class implements a number of static methods for performing common tasks
         on xcode projects. 

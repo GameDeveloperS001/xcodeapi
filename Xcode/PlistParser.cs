@@ -6,7 +6,11 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode
+#else
+namespace UnityEditor.iOS.Xcode.Custom
+#endif
 {
 
     public class PlistElement

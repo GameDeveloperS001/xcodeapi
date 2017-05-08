@@ -5,9 +5,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
-// Basr classes for section handling
+// Base classes for section handling
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode.PBX
+#else
+namespace UnityEditor.iOS.Xcode.Custom.PBX
+#endif
 {
 
     // common base

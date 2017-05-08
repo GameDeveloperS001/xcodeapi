@@ -1,4 +1,8 @@
-﻿namespace UnityEditor.iOS.Xcode
+﻿#if UNITY_XCODE_API_BUILD
+namespace UnityEditor.iOS.Xcode
+#else
+namespace UnityEditor.iOS.Xcode.Custom
+#endif
 {
     /// <summary>
     /// List of all the capabilities available.

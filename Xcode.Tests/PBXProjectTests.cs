@@ -1,8 +1,13 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+#if UNITY_XCODE_API_BUILD
 using UnityEditor.iOS.Xcode;
 using UnityEditor.iOS.Xcode.Extensions;
+#else
+using UnityEditor.iOS.Xcode.Custom;
+using UnityEditor.iOS.Xcode.Custom.Extensions;
+#endif
 
 namespace UnityEditor.iOS.Xcode.Tests
 {
@@ -41,7 +46,11 @@ namespace UnityEditor.iOS.Xcode.Tests
         
         private static void ResetGuidGenerator()
         {
+#if UNITY_XCODE_API_BUILD
             UnityEditor.iOS.Xcode.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
+#else
+            UnityEditor.iOS.Xcode.Custom.PBX.PBXGUID.SetGuidGenerator(LinearGuidGenerator.Generate);
+#endif
             LinearGuidGenerator.Reset();
         }
 

@@ -1,7 +1,11 @@
 using System;
 using System.IO;
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode
+#else
+namespace UnityEditor.iOS.Xcode.Custom
+#endif
 {
     // This class is here to help you add capabilities to your Xcode project.
     // Because capabilities modify the PBXProject, the entitlements file and/or the Info.plist and not consistently,

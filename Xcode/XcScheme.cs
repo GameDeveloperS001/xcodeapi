@@ -6,7 +6,11 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode
+#else
+namespace UnityEditor.iOS.Xcode.Custom
+#endif
 {
     internal class XcScheme
     {
@@ -44,7 +48,7 @@ namespace UnityEditor.iOS.Xcode
 
         public void ReadFromString(string text)
         {
-            m_Doc = Xcode.PlistDocument.ParseXmlNoDtd(text);
+            m_Doc = PlistDocument.ParseXmlNoDtd(text);
         }
 
         public void WriteToFile(string path)
@@ -60,7 +64,7 @@ namespace UnityEditor.iOS.Xcode
 
         public string WriteToString()
         {
-            return Xcode.PlistDocument.CleanDtdToString(m_Doc).Replace("\r\n", "\n");
+            return PlistDocument.CleanDtdToString(m_Doc).Replace("\r\n", "\n");
         }        
     }
 

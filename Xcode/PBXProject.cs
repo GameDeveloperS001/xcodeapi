@@ -2,9 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+#if UNITY_XCODE_API_BUILD
 using UnityEditor.iOS.Xcode.PBX;
+#else
+using UnityEditor.iOS.Xcode.Custom.PBX;
+#endif
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode
+#else
+namespace UnityEditor.iOS.Xcode.Custom
+#endif
 {
     using PBXBuildFileSection           = KnownSectionBase<PBXBuildFileData>;
     using PBXFileReferenceSection       = KnownSectionBase<PBXFileReferenceData>;

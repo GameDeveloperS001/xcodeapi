@@ -2,8 +2,11 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode.PBX
+#else
+namespace UnityEditor.iOS.Xcode.Custom.PBX
+#endif
 {
     
     class PBXElement

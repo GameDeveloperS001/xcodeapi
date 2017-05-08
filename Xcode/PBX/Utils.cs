@@ -4,7 +4,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
+#if UNITY_XCODE_API_BUILD
 namespace UnityEditor.iOS.Xcode.PBX
+#else
+namespace UnityEditor.iOS.Xcode.Custom.PBX
+#endif
 {
     internal class GUIDToCommentMap
     {

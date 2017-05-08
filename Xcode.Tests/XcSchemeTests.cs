@@ -1,7 +1,11 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+#if UNITY_XCODE_API_BUILD
 using UnityEditor.iOS.Xcode;
+#else
+using UnityEditor.iOS.Xcode.Custom;
+#endif
 
 namespace UnityEditor.iOS.Xcode.Tests
 {
