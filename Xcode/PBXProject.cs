@@ -1051,9 +1051,9 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="name">The name of the phase.</param>
         /// <param name="dstPath">The destination path.</param>
         /// <param name="subfolderSpec">The "subfolder spec". The following usages are known:
-        /// - "10" for embedding frameworks
-        /// - "13" for embedding app extension content
-        /// - "16" for embedding watch content</param>
+        /// "10" for embedding frameworks;
+        /// "13" for embedding app extension content;
+        /// "16" for embedding watch content</param>
         public string CopyFilesBuildPhaseByTarget(string targetGuid, string name, string dstPath, string subfolderSpec)
         {
             var target = nativeTargets[targetGuid];
@@ -1083,9 +1083,9 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="name">The name of the phase.</param>
         /// <param name="dstPath">The destination path.</param>
         /// <param name="subfolderSpec">The "subfolder spec". The following usages are known:
-        /// - "10" for embedding frameworks
-        /// - "13" for embedding app extension content
-        /// - "16" for embedding watch content</param>
+        /// "10" for embedding frameworks;
+        /// "13" for embedding app extension content;
+        /// "16" for embedding watch content</param>
         public string AddCopyFilesBuildPhase(string targetGuid, string name, string dstPath, string subfolderSpec)
         {
             var phaseGuid = CopyFilesBuildPhaseByTarget(targetGuid, name, dstPath, subfolderSpec);

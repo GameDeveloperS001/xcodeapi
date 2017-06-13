@@ -391,7 +391,7 @@ namespace UnityEditor.iOS.Xcode.Extensions
         /// </summary>
         /// <param name="proj">A project passed as this argument.</param>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
-        /// <param name="fileGuid">The file guid returned by [[AddFile]] or [[AddFolderReference]].</param>
+        /// <param name="fileGuid">The file GUID returned by [[AddFile]] or [[AddFolderReference]].</param>
         public static void AddFileToEmbedFrameworks(this PBXProject proj, string targetGuid, string fileGuid)
         {
             PBXNativeTargetData target = proj.nativeTargets[targetGuid];
