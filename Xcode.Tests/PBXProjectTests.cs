@@ -604,37 +604,37 @@ namespace UnityEditor.iOS.Xcode.Tests
             PBXProject proj = ReadPBXProject();
             string target = proj.AddTarget("TestTarget", ".dylib", "test.type");
 
-            Assert.IsNull(proj.SourcesBuildPhaseByTarget(target));
+            Assert.IsNull(proj.GetSourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000005", proj.AddSourcesBuildPhase(target));
-            Assert.AreEqual("CCCCCCCC0000000000000005", proj.SourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000005", proj.GetSourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000005", proj.AddSourcesBuildPhase(target));
 
-            Assert.IsNull(proj.ResourcesBuildPhaseByTarget(target));
+            Assert.IsNull(proj.GetReGetSourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
-            Assert.AreEqual("CCCCCCCC0000000000000006", proj.ResourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.GetReGetSourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
 
-            Assert.IsNull(proj.FrameworksBuildPhaseByTarget(target));
+            Assert.IsNull(proj.GetFrameworksBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000007", proj.AddFrameworksBuildPhase(target));
-            Assert.AreEqual("CCCCCCCC0000000000000007", proj.FrameworksBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000007", proj.GetFrameworksBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000007", proj.AddFrameworksBuildPhase(target));
 
-            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
+            Assert.IsNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
             Assert.AreEqual("CCCCCCCC0000000000000008", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "13"));
-            Assert.AreEqual("CCCCCCCC0000000000000008", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000008", proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
             Assert.AreEqual("CCCCCCCC0000000000000008", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "13"));
 
             // check whether all parameters are actually matched against existing phases
-            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
-            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
-            Assert.IsNull(proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
+            Assert.IsNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
+            Assert.IsNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
+            Assert.IsNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
 
             Assert.AreEqual("CCCCCCCC0000000000000009", proj.AddCopyFilesBuildPhase(target, "Copy files2", "", "13"));
-            Assert.AreEqual("CCCCCCCC0000000000000009", proj.CopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000009", proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files2", "", "13"));
             Assert.AreEqual("CCCCCCCC0000000000000010", proj.AddCopyFilesBuildPhase(target, "Copy files", "path", "13"));
-            Assert.AreEqual("CCCCCCCC0000000000000010", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
+            Assert.AreEqual("CCCCCCCC0000000000000010", proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "path", "13"));
             Assert.AreEqual("CCCCCCCC0000000000000011", proj.AddCopyFilesBuildPhase(target, "Copy files", "", "14"));
-            Assert.AreEqual("CCCCCCCC0000000000000011", proj.CopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
+            Assert.AreEqual("CCCCCCCC0000000000000011", proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "", "14"));
         }
 
         [Test]
@@ -683,7 +683,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             Assert.AreEqual("CCCCCCCC0000000000000001", fileGuid);
 
             proj.AddFileToEmbedFrameworks(target, fileGuid);
-            Assert.IsNotNull(proj.CopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10"));
+            Assert.IsNotNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10"));
 
             proj = Reserialize(proj);
 
@@ -692,7 +692,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             Assert.IsTrue(buildFile.codeSignOnCopy);
             Assert.IsTrue(buildFile.removeHeadersOnCopy);
 
-            var copyPhaseGuid = proj.CopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10");
+            var copyPhaseGuid = proj.GetCopyFilesBuildPhaseByTarget(target, "Embed Frameworks", "", "10");
             Assert.IsTrue(proj.copyFiles[copyPhaseGuid].files.Contains(buildFile.guid));
         }
 

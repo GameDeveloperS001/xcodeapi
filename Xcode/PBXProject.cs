@@ -938,7 +938,7 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
-        public string SourcesBuildPhaseByTarget(string targetGuid)
+        public string GetSourcesBuildPhaseByTarget(string targetGuid)
         {
             var target = nativeTargets[targetGuid];
             foreach (var phaseGuid in target.phases) {
@@ -959,7 +959,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddSourcesBuildPhase(string targetGuid)
         {
-            var phaseGuid = SourcesBuildPhaseByTarget(targetGuid);
+            var phaseGuid = GetSourcesBuildPhaseByTarget(targetGuid);
             if (phaseGuid != null)
                 return phaseGuid;
 
@@ -974,7 +974,7 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
-        public string ResourcesBuildPhaseByTarget(string targetGuid)
+        public string GetReGetSourcesBuildPhaseByTarget(string targetGuid)
         {
             var target = nativeTargets[targetGuid];
             foreach (var phaseGuid in target.phases) {
@@ -995,7 +995,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddResourcesBuildPhase(string targetGuid)
         {
-            var phaseGuid = ResourcesBuildPhaseByTarget(targetGuid);
+            var phaseGuid = GetReGetSourcesBuildPhaseByTarget(targetGuid);
             if (phaseGuid != null)
                 return phaseGuid;
 
@@ -1010,7 +1010,7 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
-        public string FrameworksBuildPhaseByTarget(string targetGuid)
+        public string GetFrameworksBuildPhaseByTarget(string targetGuid)
         {
             var target = nativeTargets[targetGuid];
             foreach (var phaseGuid in target.phases) {
@@ -1031,7 +1031,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddFrameworksBuildPhase(string targetGuid)
         {
-            var phaseGuid = FrameworksBuildPhaseByTarget(targetGuid);
+            var phaseGuid = GetFrameworksBuildPhaseByTarget(targetGuid);
             if (phaseGuid != null)
                 return phaseGuid;
 
@@ -1054,7 +1054,7 @@ namespace UnityEditor.iOS.Xcode
         /// "10" for embedding frameworks;
         /// "13" for embedding app extension content;
         /// "16" for embedding watch content</param>
-        public string CopyFilesBuildPhaseByTarget(string targetGuid, string name, string dstPath, string subfolderSpec)
+        public string GetCopyFilesBuildPhaseByTarget(string targetGuid, string name, string dstPath, string subfolderSpec)
         {
             var target = nativeTargets[targetGuid];
             foreach (var phaseGuid in target.phases) {
@@ -1088,7 +1088,7 @@ namespace UnityEditor.iOS.Xcode
         /// "16" for embedding watch content</param>
         public string AddCopyFilesBuildPhase(string targetGuid, string name, string dstPath, string subfolderSpec)
         {
-            var phaseGuid = CopyFilesBuildPhaseByTarget(targetGuid, name, dstPath, subfolderSpec);
+            var phaseGuid = GetCopyFilesBuildPhaseByTarget(targetGuid, name, dstPath, subfolderSpec);
             if (phaseGuid != null)
                 return phaseGuid;
 
