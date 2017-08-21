@@ -215,7 +215,7 @@ namespace UnityEditor.iOS.Xcode
                             return shellScripts[guid];
                     break;
             }
-            return null;
+            throw new Exception(String.Format("The given path {0} does not refer to a file in a known build section", path));
         }
 
         public FileGUIDListBase BuildSectionAny(string sectionGuid)
