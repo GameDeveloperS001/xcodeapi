@@ -183,7 +183,11 @@ namespace UnityEditor.iOS.Xcode
             m_GuidToParentGroupMap.Remove(guid);
             groups.RemoveEntry(guid);
         }
-
+        
+        // This function returns a build section that a particular file should be automatically added to.
+        // Returns null for non-buildable file types.
+        // Throws an exception if the file should be added to a section, but that particular section does not exist for given target
+        // Note that for unknown file types we add them to resource build sections
         public FileGUIDListBase BuildSectionAny(PBXNativeTargetData target, string path, bool isFolderRef)
         {
             string ext = Path.GetExtension(path);
