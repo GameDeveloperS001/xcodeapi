@@ -201,11 +201,14 @@ namespace UnityEditor.iOS.Xcode.Tests
             proj.AddFileToBuild(target, proj.AddFolderReference("relative/path2", "Classes/some/path/path2", PBXSourceTree.Source));
             // check whether we correctly add folder references with weird extensions to resources
             proj.AddFileToBuild(target, proj.AddFolderReference("relative/path3.cc", "Classes/some/path/path3.cc", PBXSourceTree.Source));
+            // check whether we correctly files which are not buildable
+            proj.AddFileToBuild(target, proj.AddFolderReference("relative/lib.dll", "Classes/some/path/lib.dll", PBXSourceTree.Source));
 
             Assert.IsTrue(proj.FindFileGuidByRealPath("relative/path1.cc") == "CCCCCCCC0000000000000001");
             Assert.IsTrue(proj.FindFileGuidByRealPath("/absolute/path/abs1.cc") == "CCCCCCCC0000000000000005");
             Assert.IsTrue(proj.FindFileGuidByProjectPath("Classes/some/path/abs1.cc") == "CCCCCCCC0000000000000005");
             Assert.AreEqual(1, proj.GetGroupChildrenFiles("Classes/some").Count);
+            
             TestOutput(proj, "add_file2.pbxproj");
         }
 
