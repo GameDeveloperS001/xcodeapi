@@ -14,6 +14,7 @@
 		CCCCCCCC0000000000000010 /* path1.unknown_ext in Resources */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000009 /* path1.unknown_ext */; };
 		CCCCCCCC0000000000000012 /* path2 in Resources */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000011 /* path2 */; };
 		CCCCCCCC0000000000000014 /* path3.cc in Resources */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000013 /* path3.cc */; };
+		CCCCCCCC0000000000000016 /* lib.dll in Resources */ = {isa = PBXBuildFile; fileRef = CCCCCCCC0000000000000015 /* lib.dll */; };
 		D82DCFC30E8000A5005D6AD8 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = D82DCFBB0E8000A5005D6AD8 /* main.mm */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 		CCCCCCCC0000000000000009 /* path1.unknown_ext */ = {isa = PBXFileReference; lastKnownFileType = file; name = path1.unknown_ext; path = relative/path1.unknown_ext; sourceTree = SOURCE_ROOT; };
 		CCCCCCCC0000000000000011 /* path2 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = path2; path = relative/path2; sourceTree = SOURCE_ROOT; };
 		CCCCCCCC0000000000000013 /* path3.cc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = path3.cc; path = relative/path3.cc; sourceTree = SOURCE_ROOT; };
+		CCCCCCCC0000000000000015 /* lib.dll */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lib.dll; path = relative/lib.dll; sourceTree = SOURCE_ROOT; };
 		D82DCFBB0E8000A5005D6AD8 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Classes/main.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -84,6 +86,7 @@
 				CCCCCCCC0000000000000009 /* path1.unknown_ext */,
 				CCCCCCCC0000000000000011 /* path2 */,
 				CCCCCCCC0000000000000013 /* path3.cc */,
+				CCCCCCCC0000000000000015 /* lib.dll */,
 			);
 			path = path;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 				CCCCCCCC0000000000000010 /* path1.unknown_ext in Resources */,
 				CCCCCCCC0000000000000012 /* path2 in Resources */,
 				CCCCCCCC0000000000000014 /* path3.cc in Resources */,
+				CCCCCCCC0000000000000016 /* lib.dll in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
