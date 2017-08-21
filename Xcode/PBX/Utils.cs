@@ -135,7 +135,8 @@ namespace UnityEditor.iOS.Xcode.PBX
         Framework,
         Source,
         Resource,
-        CopyFile
+        CopyFile, 
+        ShellScript
     }
 
     internal class FileTypeUtils
