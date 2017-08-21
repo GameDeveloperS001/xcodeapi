@@ -214,6 +214,8 @@ namespace UnityEditor.iOS.Xcode
                         if (shellScripts.HasEntry(guid))
                             return shellScripts[guid];
                     break;
+                case PBXFileType.NotBuildable:
+                    return null;
             }
             throw new Exception(String.Format("The given path {0} does not refer to a file in a known build section", path));
         }
