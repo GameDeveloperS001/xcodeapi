@@ -697,6 +697,22 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
+        public void WhenUnknownSectionExistsAddCopyFilesBuildPhaseWorks()
+        {
+            ResetGuidGenerator();
+            PBXProject proj = ReadPBXProject("base_unknown_section.pbxproj");
+            string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            
+            Assert.IsNotNull(proj.GetSourcesBuildPhaseByTarget(target));
+            Assert.IsNotNull(proj.GetReGetSourcesBuildPhaseByTarget(target));
+            Assert.IsNotNull(proj.GetFrameworksBuildPhaseByTarget(target));
+            
+            //Adding additional sections when an unknown section is already present in pbxproj should work
+            Assert.IsNull(proj.GetCopyFilesBuildPhaseByTarget(target, "Copy files", "", "13"));
+            Assert.IsNotNull(proj.AddCopyFilesBuildPhase(target, "Copy files", "", "13"));
+        }
+
+        [Test]
         public void StrippedProjectReadingWorks()
         {
             PBXProject proj = ReadPBXProject("base_stripped.pbxproj");
