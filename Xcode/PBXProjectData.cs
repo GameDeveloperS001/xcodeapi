@@ -209,6 +209,11 @@ namespace UnityEditor.iOS.Xcode
                         if (copyFiles.HasEntry(guid))
                             return copyFiles[guid];
                     break;
+                case PBXFileType.ShellScript:
+                    foreach (var guid in target.phases)
+                        if (shellScripts.HasEntry(guid))
+                            return shellScripts[guid];
+                    break;
             }
             return null;
         }
