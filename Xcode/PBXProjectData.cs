@@ -225,7 +225,7 @@ namespace UnityEditor.iOS.Xcode
                 return copyFiles[sectionGuid];
             if (shellScripts.HasEntry(sectionGuid))
                 return shellScripts[sectionGuid];
-            throw new Exception(String.Format("The given GUID {0} does not refer to a known build section", sectionGuid));
+            return null;
         }
 
         void RefreshBuildFilesMapForBuildFileGuidList(Dictionary<string, PBXBuildFileData> mapForTarget,
