@@ -974,7 +974,7 @@ namespace UnityEditor.iOS.Xcode
         /// </summary>
         /// <returns>Returns the GUID of the existing phase or null if it does not exist.</returns>
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
-        public string GetReGetSourcesBuildPhaseByTarget(string targetGuid)
+        public string GetResourcesBuildPhaseByTarget(string targetGuid)
         {
             var target = nativeTargets[targetGuid];
             foreach (var phaseGuid in target.phases) {
@@ -995,7 +995,7 @@ namespace UnityEditor.iOS.Xcode
         /// <param name="targetGuid">The GUID of the target as returned by [[TargetGuidByName()]].</param>
         public string AddResourcesBuildPhase(string targetGuid)
         {
-            var phaseGuid = GetReGetSourcesBuildPhaseByTarget(targetGuid);
+            var phaseGuid = GetResourcesBuildPhaseByTarget(targetGuid);
             if (phaseGuid != null)
                 return phaseGuid;
 

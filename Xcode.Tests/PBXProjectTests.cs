@@ -612,9 +612,9 @@ namespace UnityEditor.iOS.Xcode.Tests
             Assert.AreEqual("CCCCCCCC0000000000000005", proj.GetSourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000005", proj.AddSourcesBuildPhase(target));
 
-            Assert.IsNull(proj.GetReGetSourcesBuildPhaseByTarget(target));
+            Assert.IsNull(proj.GetResourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
-            Assert.AreEqual("CCCCCCCC0000000000000006", proj.GetReGetSourcesBuildPhaseByTarget(target));
+            Assert.AreEqual("CCCCCCCC0000000000000006", proj.GetResourcesBuildPhaseByTarget(target));
             Assert.AreEqual("CCCCCCCC0000000000000006", proj.AddResourcesBuildPhase(target));
 
             Assert.IsNull(proj.GetFrameworksBuildPhaseByTarget(target));
@@ -707,7 +707,7 @@ namespace UnityEditor.iOS.Xcode.Tests
             string target = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
             
             Assert.IsNotNull(proj.GetSourcesBuildPhaseByTarget(target));
-            Assert.IsNotNull(proj.GetReGetSourcesBuildPhaseByTarget(target));
+            Assert.IsNotNull(proj.GetResourcesBuildPhaseByTarget(target));
             Assert.IsNotNull(proj.GetFrameworksBuildPhaseByTarget(target));
             
             //Adding additional sections when an unknown section is already present in pbxproj should work
