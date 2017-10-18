@@ -115,6 +115,39 @@ namespace UnityEditor.iOS.Xcode.Tests
         }
 
         [Test]
+        public void ImageSetCanBeCreatedWithDuplicateFiles()
+        {
+            var testFiles = new TestFileCache(Path.Combine(GetTestOutputPath(), "Imageset1Files"));
+
+            string catalogPath = Path.Combine(GetTestOutputPath(), "Imageset-duplicate.xcassets");
+            var catalog = new AssetCatalog(catalogPath, "test.test");
+            var imageset = catalog.OpenImageSet("img1");
+
+            var filePath = testFiles.CreateFile("data1.png", "img1");
+            imageset.AddVariant(new DeviceRequirement().AddWidthClass(SizeClassRequirement.Regular),
+                                filePath);
+
+            imageset.AddVariant(new DeviceRequirement().AddHeightClass(SizeClassRequirement.Compact),
+                                filePath);
+
+            catalog.Write();
+
+            string imagesetPath = Path.Combine(catalogPath, "img1.imageset");
+            Assert.IsTrue(Directory.Exists(catalogPath));
+            Assert.IsTrue(Directory.Exists(imagesetPath));
+            AssertFileExistsAndHasContents(Path.Combine(imagesetPath, "Contents.json"),
+                                           File.ReadAllText(Path.Combine(GetTestSourcePath(), "Imageset-duplicate.Contents.json")));
+            AssertFileExistsAndHasContents(Path.Combine(imagesetPath, "data1.png"), "img1");
+            AssertFileExistsAndHasContents(Path.Combine(imagesetPath, "data1-1.png"), "img1");
+
+            if (!DebugEnabled())
+            {
+                testFiles.CleanUp();
+                Directory.Delete(catalogPath, true);
+            }
+        }
+
+        [Test]
         public void FoldersAreCreatedAsExpected()
         {
             var testFiles = new TestFileCache(Path.Combine(GetTestOutputPath(), "Folder1Files"));

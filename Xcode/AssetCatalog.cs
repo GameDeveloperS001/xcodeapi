@@ -453,7 +453,7 @@ namespace UnityEditor.iOS.Xcode.Custom
         }
 
         // Returns the filename of the resulting file
-        protected string CopyFileToSet(string path, List<string> warnings)
+        protected string CopyFileToSet(string path, HashSet<string> existingFilenames, List<string> warnings)
         {
             var filename = Path.GetFileName(path);
             if (!File.Exists(path))
@@ -463,6 +463,17 @@ namespace UnityEditor.iOS.Xcode.Custom
             }
             else
             {
+                // ensure that we don't create duplicate filenames
+                int index = 1;
+                string filenameBase = Path.GetFileNameWithoutExtension(filename);
+                string extension = Path.GetExtension(filename);
+
+                while (existingFilenames.Contains(filename))
+                {
+                    filename = String.Format("{0}-{1}{2}", filenameBase, index, extension);
+                    index++;
+                }
+                existingFilenames.Add(filename);
                 File.Copy(path, Path.Combine(m_Path, filename));
             }
             return filename;
@@ -511,9 +522,11 @@ namespace UnityEditor.iOS.Xcode.Custom
 
             var data = doc.root.CreateArray("data");
 
+            var existingFilenames = new HashSet<string>();
+
             foreach (DataSetVariant item in m_Variants)
             {
-                var filename = CopyFileToSet(item.path, warnings);
+                var filename = CopyFileToSet(item.path, existingFilenames, warnings);
 
                 var docItem = data.AddDict();
                 docItem.SetString("filename", filename);
@@ -642,9 +655,11 @@ namespace UnityEditor.iOS.Xcode.Custom
 
             var images = doc.root.CreateArray("images");
 
+            var existingFilenames = new HashSet<string>();
+
             foreach (ImageSetVariant item in m_Variants)
             {
-                var filename = CopyFileToSet(item.path, warnings);
+                var filename = CopyFileToSet(item.path, existingFilenames, warnings);
 
                 var docItem = images.AddDict();
                 docItem.SetString("filename", filename);
