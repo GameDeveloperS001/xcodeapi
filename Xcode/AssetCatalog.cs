@@ -451,6 +451,22 @@ namespace UnityEditor.iOS.Xcode.Custom
                     item.SetString(kv.Key, kv.Value);
             }
         }
+
+        // Returns the filename of the resulting file
+        protected string CopyFileToSet(string path, List<string> warnings)
+        {
+            var filename = Path.GetFileName(path);
+            if (!File.Exists(path))
+            {
+                if (warnings != null)
+                    warnings.Add("File not found: " + path);
+            }
+            else
+            {
+                File.Copy(path, Path.Combine(m_Path, filename));
+            }
+            return filename;
+        }
     }
 
     internal class AssetDataSet : AssetCatalogItemWithVariants
@@ -497,14 +513,7 @@ namespace UnityEditor.iOS.Xcode.Custom
 
             foreach (DataSetVariant item in m_Variants)
             {
-                var filename = Path.GetFileName(item.path);
-                if (!File.Exists(item.path))
-                {
-                    if (warnings != null)
-                        warnings.Add("File not found: " + item.path);
-                }
-                else
-                    File.Copy(item.path, Path.Combine(m_Path, filename));
+                var filename = CopyFileToSet(item.path, warnings);
 
                 var docItem = data.AddDict();
                 docItem.SetString("filename", filename);
@@ -635,14 +644,7 @@ namespace UnityEditor.iOS.Xcode.Custom
 
             foreach (ImageSetVariant item in m_Variants)
             {
-                var filename = Path.GetFileName(item.path);
-                if (!File.Exists(item.path))
-                {
-                    if (warnings != null)
-                        warnings.Add("File not found: " + item.path);
-                }
-                else
-                    File.Copy(item.path, Path.Combine(m_Path, filename));
+                var filename = CopyFileToSet(item.path, warnings);
 
                 var docItem = images.AddDict();
                 docItem.SetString("filename", filename);
