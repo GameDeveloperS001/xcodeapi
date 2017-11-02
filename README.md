@@ -14,5 +14,8 @@ Contribution
 
 Please use name your branch other than 'stable' or 'dev' for pull requests.
 
+The branch 'dev' is preferred pull request target. Pull requests to 'stable' branch will be first 
+merged to 'dev' branch.
+
 By doing a pull request to this repository you accept to release your code under the MIT
 license (see the LICENSE file).
