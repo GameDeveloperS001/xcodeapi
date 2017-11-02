@@ -47,30 +47,52 @@ namespace UnityEditor.iOS.Xcode.Custom
         }
 
         // Add the iCloud capability with the desired options.
-        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, string[] customContainers)
+        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, bool cloudKit, bool addDefaultContainers = true, string[] customContainers = null)
         {
             var ent = GetOrCreateEntitlementDoc();
-            var val = (ent.root[ICloudEntitlements.ContainerIdValue] = new PlistElementArray()) as PlistElementArray;
+            var val = (ent.root[ICloudEntitlements.ContainerIdKey] = new PlistElementArray()) as PlistElementArray;
+
+            // Cloud document storage and CloudKit require specifying services.
+            PlistElementArray ser = null;
+            if (iCloudDocument || cloudKit)
+                ser = (ent.root[ICloudEntitlements.ServicesKey] = new PlistElementArray()) as PlistElementArray;
+
             if (iCloudDocument)
             {
                 val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
-                var ser = (ent.root[ICloudEntitlements.ServicesKey] = new PlistElementArray()) as PlistElementArray;
-                ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
                 ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesDocValue));
                 var ubiquity = (ent.root[ICloudEntitlements.UbiquityContainerIdKey] = new PlistElementArray()) as PlistElementArray;
-                ubiquity.values.Add(new PlistElementString(ICloudEntitlements.UbiquityContainerIdValue));
-                for (var i = 0; i < customContainers.Length; i++)
+
+                if (addDefaultContainers)
+                    ubiquity.values.Add(new PlistElementString(ICloudEntitlements.UbiquityContainerIdValue));
+
+                if (customContainers != null && customContainers.Length > 0)
                 {
-                    ser.values.Add(new PlistElementString(customContainers[i]));
+                    // For cloud document, custom containers go in the ubiquity values.
+                    for (var i = 0; i < customContainers.Length; i++)
+                        ubiquity.values.Add(new PlistElementString(customContainers[i]));
                 }
             }
 
-            if (keyValueStorage)
+            if (cloudKit)
             {
-                ent.root[ICloudEntitlements.KeyValueStoreKey] = new PlistElementString(ICloudEntitlements.KeyValueStoreValue);
+                if (addDefaultContainers && !iCloudDocument)
+                    val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
+
+                if (customContainers != null && customContainers.Length > 0)
+                {
+                    // For CloudKit, custom containers also go in the container id values.
+                    for (var i = 0; i < customContainers.Length; i++)
+                        val.values.Add(new PlistElementString(customContainers[i]));
+                }
+
+                ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
             }
 
-            project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, iCloudDocument);
+            if (keyValueStorage)
+                ent.root[ICloudEntitlements.KeyValueStoreKey] = new PlistElementString(ICloudEntitlements.KeyValueStoreValue);
+
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, cloudKit);
         }
 
         // Add Push (or remote) Notifications capability to your project
@@ -493,8 +515,8 @@ namespace UnityEditor.iOS.Xcode.Custom
     internal class ICloudEntitlements
     {
         internal static readonly string ContainerIdKey = "com.apple.developer.icloud-container-identifiers";
-        internal static readonly string UbiquityContainerIdKey = "com.apple.developer.ubiquity-container-identifiers";
         internal static readonly string ContainerIdValue = "iCloud.$(CFBundleIdentifier)";
+        internal static readonly string UbiquityContainerIdKey = "com.apple.developer.ubiquity-container-identifiers";
         internal static readonly string UbiquityContainerIdValue = "iCloud.$(CFBundleIdentifier)";
         internal static readonly string ServicesKey = "com.apple.developer.icloud-services";
         internal static readonly string ServicesDocValue = "CloudDocuments";
