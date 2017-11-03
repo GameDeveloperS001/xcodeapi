@@ -46,6 +46,13 @@ namespace UnityEditor.iOS.Xcode.Custom
                 m_InfoPlist.WriteToFile(PBXPath.Combine(m_BuildPath, "Info.plist"));
         }
 
+        public void AddiCloud(bool enableKeyValueStorage, bool enableiCloudDocument, 
+                              string[] customContainers)
+        {
+            AddiCloud(enableKeyValueStorage, enableiCloudDocument, true, true, 
+                      customContainers);
+        }
+
         // Add the iCloud capability with the desired options.
         public void AddiCloud(bool keyValueStorage, bool iCloudDocument, bool cloudKit, bool addDefaultContainers = true, string[] customContainers = null)
         {
