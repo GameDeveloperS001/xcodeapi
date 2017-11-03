@@ -54,17 +54,17 @@ namespace UnityEditor.iOS.Xcode.Custom
         }
 
         // Add the iCloud capability with the desired options.
-        public void AddiCloud(bool keyValueStorage, bool iCloudDocument, bool cloudKit, bool addDefaultContainers = true, string[] customContainers = null)
+        public void AddiCloud(bool enableKeyValueStorage, bool enableiCloudDocument, bool enablecloudKit, bool addDefaultContainers, string[] customContainers)
         {
             var ent = GetOrCreateEntitlementDoc();
             var val = (ent.root[ICloudEntitlements.ContainerIdKey] = new PlistElementArray()) as PlistElementArray;
 
             // Cloud document storage and CloudKit require specifying services.
             PlistElementArray ser = null;
-            if (iCloudDocument || cloudKit)
+            if (enableiCloudDocument || enablecloudKit)
                 ser = (ent.root[ICloudEntitlements.ServicesKey] = new PlistElementArray()) as PlistElementArray;
 
-            if (iCloudDocument)
+            if (enableiCloudDocument)
             {
                 val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
                 ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesDocValue));
@@ -81,9 +81,9 @@ namespace UnityEditor.iOS.Xcode.Custom
                 }
             }
 
-            if (cloudKit)
+            if (enablecloudKit)
             {
-                if (addDefaultContainers && !iCloudDocument)
+                if (addDefaultContainers && !enableiCloudDocument)
                     val.values.Add(new PlistElementString(ICloudEntitlements.ContainerIdValue));
 
                 if (customContainers != null && customContainers.Length > 0)
@@ -96,10 +96,10 @@ namespace UnityEditor.iOS.Xcode.Custom
                 ser.values.Add(new PlistElementString(ICloudEntitlements.ServicesKitValue));
             }
 
-            if (keyValueStorage)
+            if (enableKeyValueStorage)
                 ent.root[ICloudEntitlements.KeyValueStoreKey] = new PlistElementString(ICloudEntitlements.KeyValueStoreValue);
 
-            project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, cloudKit);
+            project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, enablecloudKit);
         }
 
         // Add Push (or remote) Notifications capability to your project
