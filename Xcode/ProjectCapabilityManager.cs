@@ -7,12 +7,13 @@ namespace UnityEditor.iOS.Xcode
 namespace UnityEditor.iOS.Xcode.Custom
 #endif
 {
-    // This class is here to help you add capabilities to your Xcode project.
-    // Because capabilities modify the PBXProject, the entitlements file and/or the Info.plist and not consistently,
-    // it can be tedious.
-    // Therefore this class open the PBXProject that is always modify by capabilities and open Entitlement and info.plist only when needed.
-    // For optimisation reasons, we write the file only in the close method.
-    // If you don't call it the file will not be written.
+    /// <summary>
+    /// The ProjectCapabilityManager class helps to add capabilities to the Xcode 
+    /// project. This operation potentially involves modification of any of the 
+    /// pbxproj file, the entitlements file(s) and Info.plist file(s). The 
+    /// manager assumes ownership of all of these files until the last 
+    /// WriteToFile() invocation.
+    /// </summary>
     public class ProjectCapabilityManager
     {
         private readonly string m_BuildPath;
@@ -23,7 +24,15 @@ namespace UnityEditor.iOS.Xcode.Custom
         private PlistDocument m_InfoPlist;
         protected internal PBXProject project;
 
-        // Create the manager with the required parameter to open files and set the properties in the write place.
+        /// <summary>
+        /// Creates a new instance of ProjectCapabilityManager. The returned 
+        /// instance assumes ownership of the referenced pbxproj project file, 
+        /// the entitlements file and project Info.plist files until the last 
+        /// WriteToFile() call.
+        /// </summary>
+        /// <param name="pbxProjectPath">Path to the pbxproj file.</param>
+        /// <param name="entitlementFilePath">Path to the entitlements file.</param>
+        /// <param name="targetName">The name of the target to add entitlements for.</param>
         public ProjectCapabilityManager(string pbxProjectPath, string entitlementFilePath, string targetName)
         {
             m_BuildPath = Directory.GetParent(Path.GetDirectoryName(pbxProjectPath)).FullName;
@@ -35,8 +44,12 @@ namespace UnityEditor.iOS.Xcode.Custom
             m_TargetGuid = project.TargetGuidByName(targetName);
         }
 
-        // Write the actual file to the disk.
-        // If you don't call this method nothing will change.
+        /// <summary>
+        /// Writes the modifications to the project file, entitlements file and 
+        /// the Info.plist file. Any external changes to these files after
+        /// the ProjectCapabilityManager instance has been created and before
+        /// the call to WriteToFile() will be overwritten.
+        /// </summary>
         public void WriteToFile()
         {
             File.WriteAllText(m_PBXProjectPath, project.WriteToString());
@@ -46,6 +59,12 @@ namespace UnityEditor.iOS.Xcode.Custom
                 m_InfoPlist.WriteToFile(PBXPath.Combine(m_BuildPath, "Info.plist"));
         }
 
+        /// <summary>
+        /// Adds iCloud capability to project
+        /// </summary>
+        /// <param name="enableKeyValueStorage">Enables key-value storage option if set to true</param>
+        /// <param name="enableiCloudDocument">Enables iCloud document option if set to true</param>
+        /// <param name="customContainers">A list of custom containers to add</param>
         public void AddiCloud(bool enableKeyValueStorage, bool enableiCloudDocument, 
                               string[] customContainers)
         {
@@ -53,7 +72,14 @@ namespace UnityEditor.iOS.Xcode.Custom
                       customContainers);
         }
 
-        // Add the iCloud capability with the desired options.
+        /// <summary>
+        /// Adds iCloud capability to project
+        /// </summary>
+        /// <param name="enableKeyValueStorage">Enables key-value storage option if set to true</param>
+        /// <param name="enableiCloudDocument">Enables iCloud document option if set to true</param>
+        /// <param name="enablecloudKit">Enables cloudKit option if set to true</param>
+        /// <param name="addDefaultContainers">Default containers are added if this option is set to true</param>
+        /// <param name="customContainers">A list of custom containers to add</param>
         public void AddiCloud(bool enableKeyValueStorage, bool enableiCloudDocument, bool enablecloudKit, bool addDefaultContainers, string[] customContainers)
         {
             var ent = GetOrCreateEntitlementDoc();
@@ -102,14 +128,19 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.iCloud, m_EntitlementFilePath, enablecloudKit);
         }
 
-        // Add Push (or remote) Notifications capability to your project
+        /// <summary>
+        /// Add Push (or remote) Notifications capability to the project
+        /// </summary>
+        /// <param name="development">Sets the development option if set to true</param>
         public void AddPushNotifications(bool development)
         {
             GetOrCreateEntitlementDoc().root[PushNotificationEntitlements.Key] = new PlistElementString(development ? PushNotificationEntitlements.DevelopmentValue : PushNotificationEntitlements.ProductionValue);
             project.AddCapability(m_TargetGuid, PBXCapabilityType.PushNotifications, m_EntitlementFilePath);
         }
 
-        // Add GameCenter capability to the project.
+        /// <summary>
+        /// Adds Game Center capability to the project
+        /// </summary>
         public void AddGameCenter()
         {
             var arr = (GetOrCreateInfoDoc().root[GameCenterInfo.Key] ?? (GetOrCreateInfoDoc().root[GameCenterInfo.Key] = new PlistElementArray())) as PlistElementArray;
@@ -117,7 +148,12 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.GameCenter);
         }
 
-        // Add Wallet capability to the project.
+        /// <summary>
+        /// Adds wallet capability to the project.
+        /// </summary>
+        /// <param name="passSubset">Controls the allowed pass types. If null or
+        /// empty, then all team pass types are allowed. Otherwise, only the 
+        /// specified subset of pass types is allowed</param>
         public void AddWallet(string[] passSubset)
         {
             var arr = (GetOrCreateEntitlementDoc().root[WalletEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -137,7 +173,9 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.Wallet, m_EntitlementFilePath);
         }
 
-        // Add Siri capability to the project.
+        /// <summary>
+        /// Adds Siri capability to project.
+        /// </summary>
         public void AddSiri()
         {
             GetOrCreateEntitlementDoc().root[SiriEntitlements.Key] = new PlistElementBoolean(true);
@@ -145,7 +183,10 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.Siri, m_EntitlementFilePath);
         }
 
-        // Add Apple Pay capability to the project.
+        /// <summary>
+        /// Adds Apple Pay capability to the project.
+        /// </summary>
+        /// <param name="merchants">The list of merchant IDs to configure</param>
         public void AddApplePay(string[] merchants)
         {
             var arr = (GetOrCreateEntitlementDoc().root[ApplePayEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -157,13 +198,18 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.ApplePay, m_EntitlementFilePath);
         }
 
-        // Add In App Purchase capability to the project.
+        /// <summary>
+        /// Adds In App Purchase capability to the project.
+        /// </summary>
         public void AddInAppPurchase()
         {
             project.AddCapability(m_TargetGuid, PBXCapabilityType.InAppPurchase);
         }
 
-        // Add Maps capability to the project.
+        /// <summary>
+        /// Adds Maps capability to the project.
+        /// </summary>
+        /// <param name="options">The routing options to configure.</param>
         public void AddMaps(MapsOptions options)
         {
             var bundleArr = (GetOrCreateInfoDoc().root[MapsInfo.BundleKey] ?? (GetOrCreateInfoDoc().root[MapsInfo.BundleKey] = new PlistElementArray())) as PlistElementArray;
@@ -227,7 +273,9 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.Maps);
         }
 
-        // Add Personal VPN capability to the project.
+        /// <summary>
+        /// Adds Personal VPN capability to the project.
+        /// </summary>
         public void AddPersonalVPN()
         {
             var arr = (GetOrCreateEntitlementDoc().root[VPNEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -236,7 +284,10 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.PersonalVPN, m_EntitlementFilePath);
         }
 
-        // Add Background capability to the project with the options wanted.
+        /// <summary>
+        /// Adds Background capability to the project.
+        /// </summary>
+        /// <param name="options">The list of background modes to configure.</param>
         public void AddBackgroundModes(BackgroundModesOptions options)
         {
             var optionArr = (GetOrCreateInfoDoc().root[BackgroundInfo.Key] ??
@@ -277,7 +328,10 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.BackgroundModes);
         }
 
-        // Add Keychain Sharing capability to the project with a list of groups.
+        /// <summary>
+        /// Adds Keychain Sharing capability to the project.
+        /// </summary>
+        /// <param name="accessGroups">The list of keychain access groups to configure.</param>
         public void AddKeychainSharing(string[] accessGroups)
         {
             var arr = (GetOrCreateEntitlementDoc().root[KeyChainEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -296,14 +350,19 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.KeychainSharing, m_EntitlementFilePath);
         }
 
-        // Add Inter App Audio capability to the project.
+        /// <summary>
+        /// Adds Inter App Audio capability to the project.
+        /// </summary>
         public void AddInterAppAudio()
         {
             GetOrCreateEntitlementDoc().root[AudioEntitlements.Key] = new PlistElementBoolean(true);
             project.AddCapability(m_TargetGuid, PBXCapabilityType.InterAppAudio, m_EntitlementFilePath);
         }
 
-        // Add Associated Domains capability to the project.
+        /// <summary>
+        /// Adds Associated Domains capability to the project.
+        /// </summary>
+        /// <param name="domains">The list of domains to configure.</param>
         public void AddAssociatedDomains(string[] domains)
         {
             var arr = (GetOrCreateEntitlementDoc().root[AssociatedDomainsEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -315,7 +374,10 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.AssociatedDomains, m_EntitlementFilePath);
         }
 
-        // Add App Groups capability to the project.
+        /// <summary>
+        /// Adds App Groups capability to the project.
+        /// </summary>
+        /// <param name="groups">The list of app groups to configure.</param>
         public void AddAppGroups(string[] groups)
         {
             var arr = (GetOrCreateEntitlementDoc().root[AppGroupsEntitlements.Key] = new PlistElementArray()) as PlistElementArray;
@@ -327,21 +389,27 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.AppGroups, m_EntitlementFilePath);
         }
 
-        // Add HomeKit capability to the project.
+        /// <summary>
+        /// Adds HomeKit capability to the project.
+        /// </summary>
         public void AddHomeKit()
         {
             GetOrCreateEntitlementDoc().root[HomeKitEntitlements.Key] = new PlistElementBoolean(true);
             project.AddCapability(m_TargetGuid, PBXCapabilityType.HomeKit, m_EntitlementFilePath);
         }
 
-        // Add Data Protection capability to the project.
+        /// <summary>
+        /// Adds Data Protection capability to the project.
+        /// </summary>
         public void AddDataProtection()
         {
             GetOrCreateEntitlementDoc().root[DataProtectionEntitlements.Key] = new PlistElementString(DataProtectionEntitlements.Value);
             project.AddCapability(m_TargetGuid, PBXCapabilityType.DataProtection, m_EntitlementFilePath);
         }
 
-        // Add HealthKit capability to the project.
+        /// <summary>
+        /// Adds HealthKit capability to the project.
+        /// </summary>
         public void AddHealthKit()
         {
             var capabilityArr = (GetOrCreateInfoDoc().root[HealthInfo.Key] ??
@@ -351,7 +419,9 @@ namespace UnityEditor.iOS.Xcode.Custom
             project.AddCapability(m_TargetGuid, PBXCapabilityType.HealthKit, m_EntitlementFilePath);
         }
 
-        // Add Wireless Accessory Configuration capability to the project.
+        /// <summary>
+        /// Adds Wireless Accessory Configuration capability to the project.
+        /// </summary>
         public void AddWirelessAccessoryConfiguration()
         {
             GetOrCreateEntitlementDoc().root[WirelessAccessoryConfigurationEntitlements.Key] = new PlistElementBoolean(true);
