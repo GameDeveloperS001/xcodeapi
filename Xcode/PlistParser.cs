@@ -211,6 +211,11 @@ namespace UnityEditor.iOS.Xcode.Custom
             }
         }
 
+        internal static string CleanDtdToString(XDocument doc)
+        {
+            return CleanDtdToString(doc, doc.DocumentType);
+        }
+
         private static string GetText(XElement xml)
         {
             return String.Join("", xml.Nodes().OfType<XText>().Select(x => x.Value).ToArray());
