@@ -23,8 +23,8 @@ namespace UnityEditor.iOS.Xcode.Custom
         public bool AsBoolean()  { return ((PlistElementBoolean)this).value; }
         public PlistElementArray AsArray() { return (PlistElementArray)this; }
         public PlistElementDict AsDict()   { return (PlistElementDict)this; }
-        public PlistElementReal AsReal() { return (PlistElementReal)this; }
-        public PlistElementDate AsDate() { return (PlistElementDate)this; }
+        public float AsReal() { return ((PlistElementReal)this).value; }
+        public DateTime AsDate() { return ((PlistElementDate)this).value; }
 
         public PlistElement this[string key]
         {

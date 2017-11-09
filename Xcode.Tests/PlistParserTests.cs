@@ -36,7 +36,7 @@ namespace UnityEditor.iOS.Xcode.Tests
 </dict>
 "));
             Assert.IsTrue(doc.root.values.ContainsKey("test"));
-            var date = doc.root["test"].AsDate().value;
+            var date = doc.root["test"].AsDate();
             Assert.AreEqual(new System.DateTime(2009, 1, 2, 10, 11, 12, System.DateTimeKind.Utc), date);
         }
 
@@ -65,7 +65,7 @@ namespace UnityEditor.iOS.Xcode.Tests
 </dict>
 "));
             Assert.IsTrue(doc.root.values.ContainsKey("test"));
-            var date = doc.root["test"].AsReal().value;
+            var date = doc.root["test"].AsReal();
             Assert.AreEqual(12.1234f, date);
         }
 
