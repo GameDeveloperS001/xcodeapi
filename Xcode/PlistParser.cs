@@ -148,6 +148,16 @@ namespace UnityEditor.iOS.Xcode.Custom
             values.Add(new PlistElementBoolean(val));
         }
 
+        public void AddDate(DateTime val)
+        {
+            values.Add(new PlistElementDate(val));
+        }
+
+        public void AddReal(float val)
+        {
+            values.Add(new PlistElementReal(val));
+        }
+
         public PlistElementArray AddArray()
         {
             var v = new PlistElementArray();
